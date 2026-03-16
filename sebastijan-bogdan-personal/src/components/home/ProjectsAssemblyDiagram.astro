@@ -1,0 +1,126 @@
+---
+interface Props {
+  className?: string;
+}
+
+const { className = "" } = Astro.props;
+---
+
+<svg
+  class={`projects-core-diagram ${className}`}
+  viewBox="0 0 980 620"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+>
+  <g class="assembly-grid" data-project-layer="grid">
+    <path data-line-draw data-project-shared-line d="M60 126H920" />
+    <path data-line-draw data-project-shared-line d="M60 244H920" />
+    <path data-line-draw data-project-shared-line d="M60 362H920" />
+    <path data-line-draw data-project-shared-line d="M60 480H920" />
+    <path data-line-draw data-project-shared-line d="M220 80V540" />
+    <path data-line-draw data-project-shared-line d="M490 80V540" />
+    <path data-line-draw data-project-shared-line d="M760 80V540" />
+  </g>
+
+  <g class="assembly-shared" data-core-part="shared" data-project-layer="shared">
+    <rect x="170" y="138" width="640" height="340" rx="44" data-line-draw data-project-shared-line />
+    <rect x="214" y="176" width="552" height="264" rx="32" data-line-draw data-project-shared-line />
+    <circle cx="490" cy="308" r="96" data-line-draw data-project-shared-line />
+    <circle cx="490" cy="308" r="64" data-line-draw data-project-shared-line />
+    <path d="M214 308H766" data-line-draw data-project-shared-line />
+    <path d="M490 176V440" data-line-draw data-project-shared-line />
+    <rect x="124" y="240" width="96" height="136" rx="16" data-line-draw data-project-shared-line />
+    <rect x="760" y="240" width="96" height="136" rx="16" data-line-draw data-project-shared-line />
+    <path d="M220 280H168" data-line-draw data-project-shared-line />
+    <path d="M760 336H820" data-line-draw data-project-shared-line />
+  </g>
+
+  <g class="assembly-module assembly-module-fleetfuel" data-core-part="fleetfuel" data-project-layer="module">
+    <path d="M238 202L316 202" data-line-draw />
+    <path d="M238 224L304 224" data-line-draw />
+    <path d="M238 246L292 246" data-line-draw />
+    <path d="M270 274A90 90 0 0 1 410 196" data-line-draw />
+    <path d="M286 274A73 73 0 0 1 400 210" data-line-draw />
+    <path d="M308 274A54 54 0 0 1 390 224" data-line-draw />
+    <circle cx="334" cy="262" r="9" data-line-draw />
+    <path d="M334 262L382 218" data-line-draw />
+    <path d="M208 308H322" data-line-draw />
+    <circle cx="322" cy="308" r="5" data-line-draw />
+  </g>
+
+  <g class="assembly-module assembly-module-steuerfux" data-core-part="steuerfux" data-project-layer="module">
+    <rect x="562" y="196" width="158" height="210" rx="16" data-line-draw />
+    <rect x="586" y="220" width="110" height="28" rx="8" data-line-draw />
+    <path d="M586 268H696" data-line-draw />
+    <path d="M586 290H696" data-line-draw />
+    <path d="M586 312H676" data-line-draw />
+    <path d="M548 214H562" data-line-draw />
+    <path d="M720 226H744V386H698" data-line-draw />
+    <rect x="534" y="334" width="118" height="84" rx="12" data-line-draw />
+    <path d="M652 360H686" data-line-draw />
+    <circle cx="686" cy="360" r="5" data-line-draw />
+  </g>
+
+  <g class="assembly-module assembly-module-automation" data-core-part="automation" data-project-layer="module">
+    <circle cx="378" cy="420" r="16" data-line-draw />
+    <circle cx="468" cy="464" r="14" data-line-draw />
+    <circle cx="548" cy="420" r="16" data-line-draw />
+    <circle cx="610" cy="470" r="13" data-line-draw />
+    <circle cx="688" cy="420" r="16" data-line-draw />
+    <path d="M392 410L454 382" data-line-draw />
+    <path d="M484 456L532 428" data-line-draw />
+    <path d="M562 424L596 460" data-line-draw />
+    <path d="M622 462L674 430" data-line-draw />
+    <path d="M392 430L454 458" data-line-draw />
+    <path d="M560 412L616 414" data-line-draw />
+    <path d="M330 452H378" data-line-draw />
+    <path d="M688 404H760" data-line-draw />
+  </g>
+
+  <g class="assembly-overlay assembly-overlay-fleetfuel" data-project-overlay data-project-mode="fleetfuel">
+    <path data-line-draw data-project-trace data-project-mode="fleetfuel" d="M260 166A136 136 0 0 1 444 168" />
+    <path data-line-draw data-project-trace data-project-mode="fleetfuel" d="M242 180A156 156 0 0 1 460 182" />
+    <path data-line-draw data-project-trace data-project-mode="fleetfuel" d="M338 188V160" />
+    <path data-line-draw data-project-trace data-project-mode="fleetfuel" d="M368 184V156" />
+    <path data-line-draw data-project-trace data-project-mode="fleetfuel" d="M398 188V160" />
+    <path data-line-draw data-project-trace data-project-mode="fleetfuel" d="M322 300C344 330 382 344 420 344" />
+  </g>
+
+  <g class="assembly-overlay assembly-overlay-steuerfux" data-project-overlay data-project-mode="steuerfux">
+    <rect x="548" y="180" width="182" height="236" rx="20" data-line-draw data-project-trace data-project-mode="steuerfux" />
+    <path data-line-draw data-project-trace data-project-mode="steuerfux" d="M526 218H548" />
+    <path data-line-draw data-project-trace data-project-mode="steuerfux" d="M730 244H776V396H700" />
+    <path data-line-draw data-project-trace data-project-mode="steuerfux" d="M554 350H534V432H680" />
+    <path data-line-draw data-project-trace data-project-mode="steuerfux" d="M586 350H696" />
+    <path data-line-draw data-project-trace data-project-mode="steuerfux" d="M586 372H696" />
+    <path data-line-draw data-project-trace data-project-mode="steuerfux" d="M586 394H670" />
+  </g>
+
+  <g class="assembly-overlay assembly-overlay-automation" data-project-overlay data-project-mode="automation">
+    <path data-line-draw data-project-trace data-project-mode="automation" d="M336 420H760" />
+    <path data-line-draw data-project-trace data-project-mode="automation" d="M378 420L468 464L548 420L610 470L688 420" />
+    <path data-line-draw data-project-trace data-project-mode="automation" d="M468 464L468 520H610" />
+    <path data-line-draw data-project-trace data-project-mode="automation" d="M548 420V362H742" />
+    <path data-line-draw data-project-trace data-project-mode="automation" d="M378 420V362H292" />
+    <circle cx="378" cy="420" r="4" data-line-draw data-project-trace data-project-mode="automation" />
+    <circle cx="468" cy="464" r="4" data-line-draw data-project-trace data-project-mode="automation" />
+    <circle cx="548" cy="420" r="4" data-line-draw data-project-trace data-project-mode="automation" />
+    <circle cx="610" cy="470" r="4" data-line-draw data-project-trace data-project-mode="automation" />
+    <circle cx="688" cy="420" r="4" data-line-draw data-project-trace data-project-mode="automation" />
+  </g>
+
+  <g class="assembly-callouts">
+    <path data-line-draw data-project-callout data-project-mode="fleetfuel" d="M334 262H172V144" />
+    <path data-line-draw data-project-callout data-project-mode="fleetfuel" d="M322 308H168V270" />
+    <circle cx="334" cy="262" r="5" data-line-draw data-project-callout-node data-project-mode="fleetfuel" />
+
+    <path data-line-draw data-project-callout data-project-mode="steuerfux" d="M686 360H876V244" />
+    <path data-line-draw data-project-callout data-project-mode="steuerfux" d="M720 226H860" />
+    <circle cx="686" cy="360" r="5" data-line-draw data-project-callout-node data-project-mode="steuerfux" />
+
+    <path data-line-draw data-project-callout data-project-mode="automation" d="M610 470V554H284" />
+    <path data-line-draw data-project-callout data-project-mode="automation" d="M378 420H214V522" />
+    <circle cx="610" cy="470" r="5" data-line-draw data-project-callout-node data-project-mode="automation" />
+  </g>
+</svg>

@@ -47,13 +47,24 @@ function applyReducedMotionState(root: HTMLElement): void {
   const revealNodes = Array.from(root.querySelectorAll<HTMLElement>(REVEAL_SELECTOR));
   const growLines = Array.from(root.querySelectorAll<HTMLElement>(LINE_GROW_SELECTOR));
   const drawLines = Array.from(root.querySelectorAll<SVGElement>(LINE_DRAW_SELECTOR));
+  const projectPanels = Array.from(root.querySelectorAll<HTMLElement>("[data-project-panel]"));
+  const projectDots = Array.from(root.querySelectorAll<HTMLElement>("[data-project-dot]"));
 
   gsap.set(revealNodes, { autoAlpha: 1, y: 0, x: 0, scale: 1 });
   gsap.set(growLines, { scaleX: 1, scaleY: 1 });
+  gsap.set(projectPanels, { autoAlpha: 1, y: 0, x: 0, scale: 1 });
+  gsap.set(projectDots, { autoAlpha: 1, scale: 1 });
   drawLines.forEach((line) => {
     line.style.strokeDasharray = "none";
     line.style.strokeDashoffset = "0";
   });
+
+  if (projectPanels.length) {
+    setActiveIndex(projectPanels, 0);
+  }
+  if (projectDots.length) {
+    setActiveIndex(projectDots, 0);
+  }
 
   root.querySelectorAll("[data-hero-label], [data-hero-stage-dot]").forEach((node) => {
     if (node instanceof HTMLElement) {
@@ -147,8 +158,18 @@ function setupActHandoffs(root: HTMLElement, breakpoint: HomeBreakpoint): void {
     const outgoingAct = acts[index - 1];
     const incomingActName = incomingAct.dataset.act ?? "";
     const outgoingActName = outgoingAct.dataset.act ?? "";
+    const isProjectsAdjacentDesktop =
+      isDesktop &&
+      ((incomingActName === "projects" && outgoingActName === "experience") ||
+        (incomingActName === "toolbox" && outgoingActName === "projects"));
     const skipOutgoingMotion =
-      isDesktop && (pinnedDesktopActs.has(incomingActName) || pinnedDesktopActs.has(outgoingActName));
+      isDesktop &&
+      (pinnedDesktopActs.has(incomingActName) || pinnedDesktopActs.has(outgoingActName)) &&
+      !isProjectsAdjacentDesktop;
+    const incomingFromY = isProjectsAdjacentDesktop ? 0 : cfg.incomingFromY;
+    const outgoingToY = isProjectsAdjacentDesktop ? 0 : cfg.outgoingToY;
+    const incomingFromAlpha = isProjectsAdjacentDesktop ? 0.9 : cfg.incomingFromAlpha;
+    const outgoingToAlpha = isProjectsAdjacentDesktop ? 0.95 : cfg.outgoingToAlpha;
     const incomingPanel = incomingAct.querySelector<HTMLElement>("[data-scene-panel]");
     const outgoingPanel = outgoingAct.querySelector<HTMLElement>("[data-scene-panel]");
 
@@ -175,7 +196,7 @@ function setupActHandoffs(root: HTMLElement, breakpoint: HomeBreakpoint): void {
 
     handoffTl.fromTo(
       incomingPanel,
-      { yPercent: cfg.incomingFromY, autoAlpha: cfg.incomingFromAlpha, immediateRender: false },
+      { yPercent: incomingFromY, autoAlpha: incomingFromAlpha, immediateRender: false },
       { yPercent: 0, autoAlpha: 1, immediateRender: false },
       0
     );
@@ -184,7 +205,7 @@ function setupActHandoffs(root: HTMLElement, breakpoint: HomeBreakpoint): void {
       handoffTl.fromTo(
         outgoingPanel,
         { yPercent: 0, autoAlpha: 1 },
-        { yPercent: cfg.outgoingToY, autoAlpha: cfg.outgoingToAlpha, immediateRender: false },
+        { yPercent: outgoingToY, autoAlpha: outgoingToAlpha, immediateRender: false },
         0.35
       );
     }
@@ -395,69 +416,260 @@ function setupProjectsScene(root: HTMLElement, breakpoint: HomeBreakpoint): void
   if (!act) return;
 
   const stage = act.querySelector<HTMLElement>("[data-project-stage]");
+  const field = act.querySelector<HTMLElement>("[data-project-field]");
   const introNodes = Array.from(act.querySelectorAll<HTMLElement>(".act-header [data-reveal]"));
-  const stations = Array.from(act.querySelectorAll<HTMLElement>("[data-project-station]"));
-  const diagramLines = Array.from(act.querySelectorAll<SVGElement>(".projects-diagram [data-line-draw]"));
-  const links = Array.from(act.querySelectorAll<SVGElement>("[data-project-link]"));
+  const sharedParts = Array.from(act.querySelectorAll<HTMLElement>("[data-core-part='shared']"));
+  const sharedLines = Array.from(act.querySelectorAll<SVGElement>("[data-project-shared-line]"));
+  const panels = Array.from(act.querySelectorAll<HTMLElement>("[data-project-panel]"));
   const dots = Array.from(act.querySelectorAll<HTMLElement>("[data-project-dot]"));
 
-  if (!stage || !stations.length) return;
+  if (!stage || !field || panels.length < 3) return;
 
-  const stationTraces = stations.map((station) =>
-    Array.from(station.querySelectorAll<SVGElement>("[data-project-trace]"))
-  );
+  type ProjectMode = "fleetfuel" | "steuerfux" | "automation";
+  const projectModes: ProjectMode[] = ["fleetfuel", "steuerfux", "automation"];
 
-  gsap.set(stations, { autoAlpha: 0.52, scale: 0.94, y: 10 });
-  gsap.set(dots, { autoAlpha: 0.54 });
-  stationTraces.flat().forEach((line) => {
-    primeSvgLine(line);
-  });
+  const orderedPanels = projectModes
+    .map((mode, index) => panels.find((panel) => panel.dataset.projectMode === mode) ?? panels[index])
+    .filter((panel): panel is HTMLElement => panel instanceof HTMLElement);
 
-  const activateProject = (index: number) => {
-    setActiveIndex(stations, index);
-    setActiveIndex(dots, index);
-    stations.forEach((station, stationIndex) => {
-      const isActive = stationIndex === index;
-      gsap.to(station, {
-        autoAlpha: isActive ? 1 : 0.24,
-        scale: isActive ? 1.02 : 0.92,
-        y: isActive ? 0 : stationIndex < index ? -18 : 18,
-        duration: 0.18,
-        overwrite: "auto",
-        ease: "power2.out"
-      });
+  const modeAssets = Object.fromEntries(
+    projectModes.map((mode) => [
+      mode,
+      {
+        parts: Array.from(act.querySelectorAll<HTMLElement>(`[data-core-part='${mode}']`)),
+        overlays: Array.from(
+          act.querySelectorAll<SVGElement>(`[data-project-overlay][data-project-mode='${mode}']`)
+        ),
+        callouts: Array.from(
+          act.querySelectorAll<SVGElement>(
+            `[data-project-callout][data-project-mode='${mode}'], [data-project-callout-node][data-project-mode='${mode}']`
+          )
+        ),
+        traces: Array.from(act.querySelectorAll<SVGElement>(`[data-project-trace][data-project-mode='${mode}']`))
+      }
+    ])
+  ) as Record<
+    ProjectMode,
+    {
+      parts: HTMLElement[];
+      overlays: SVGElement[];
+      callouts: SVGElement[];
+      traces: SVGElement[];
+    }
+  >;
 
-      const traces = stationTraces[stationIndex] ?? [];
-      traces.forEach((trace) => {
-        gsap.to(trace, {
-          strokeDashoffset: isActive ? 0 : Number(trace.style.strokeDasharray || 0),
-          duration: 0.18,
-          overwrite: "auto",
-          ease: "power2.out"
-        });
-      });
-    });
+  const allOverlays = projectModes.flatMap((mode) => modeAssets[mode].overlays);
+  const allCallouts = projectModes.flatMap((mode) => modeAssets[mode].callouts);
+
+  const isDesktop = breakpoint === "desktop";
+  const offsetScale = isDesktop ? 1 : breakpoint === "tablet" ? 0.68 : 0.42;
+  const modeOffsets: Record<ProjectMode, { x: number; y: number; rotation: number }> = {
+    fleetfuel: { x: -56 * offsetScale, y: -44 * offsetScale, rotation: -8 * offsetScale },
+    steuerfux: { x: 66 * offsetScale, y: -16 * offsetScale, rotation: 7 * offsetScale },
+    automation: { x: 42 * offsetScale, y: 54 * offsetScale, rotation: -6 * offsetScale }
   };
+
+  const modeBalancedOffsets: Record<ProjectMode, { x: number; y: number; rotation: number }> = {
+    fleetfuel: { x: -12 * offsetScale, y: -8 * offsetScale, rotation: -1.5 * offsetScale },
+    steuerfux: { x: 14 * offsetScale, y: -4 * offsetScale, rotation: 1.2 * offsetScale },
+    automation: { x: 10 * offsetScale, y: 11 * offsetScale, rotation: -1.1 * offsetScale }
+  };
+
+  const setMode = (index: number) => {
+    setActiveIndex(orderedPanels, index);
+    setActiveIndex(dots, index);
+    act.dataset.projectMode = projectModes[index] ?? "neutral";
+  };
+
+  const clearMode = () => {
+    orderedPanels.forEach((panel) => panel.classList.remove("is-active"));
+    dots.forEach((dot) => dot.classList.remove("is-active"));
+    act.dataset.projectMode = "neutral";
+  };
+
+  clearMode();
+  gsap.set(stage, { "--project-field-shift": "0px" });
+  gsap.set(sharedParts, { autoAlpha: 0.84, scale: 0.97, transformOrigin: "center center" });
+  gsap.set(sharedLines, { autoAlpha: 0.34 });
+  gsap.set(orderedPanels, { autoAlpha: 0.24, y: 12, scale: 0.98 });
+  gsap.set(dots, { autoAlpha: 0.48, scale: 1 });
+  gsap.set(allOverlays, { autoAlpha: 0.08 });
+  gsap.set(allCallouts, { autoAlpha: 0.08 });
+
+  projectModes.forEach((mode) => {
+    const { x, y, rotation } = modeOffsets[mode];
+    gsap.set(modeAssets[mode].parts, {
+      x,
+      y,
+      rotation,
+      autoAlpha: 0.48,
+      transformOrigin: "center center"
+    });
+  });
 
   const projectsTl = gsap.timeline({
     defaults: { ease: "none" },
     scrollTrigger: {
       trigger: act,
-      start: breakpoint === "desktop" ? "top top+=84" : "top 72%",
-      end: breakpoint === "desktop" ? "+=340%" : "bottom 26%",
+      start: breakpoint === "desktop" ? "top top+=84" : breakpoint === "tablet" ? "top top+=88" : "top 76%",
+      end: breakpoint === "desktop" ? "+=388%" : breakpoint === "tablet" ? "+=248%" : "bottom 20%",
       scrub: true,
-      pin: breakpoint === "desktop",
+      pin: breakpoint !== "mobile",
       pinSpacing: true,
       anticipatePin: 1
     }
   });
 
-  projectsTl.to(introNodes, { autoAlpha: 1, y: 0, duration: 0.18, stagger: 0.05 }, 0.01);
-  projectsTl.to(diagramLines, { strokeDashoffset: 0, duration: 0.2, stagger: 0.02 }, 0.02);
-  projectsTl.to(links, { strokeDashoffset: 0, duration: 0.2, stagger: 0.05 }, 0.04);
-  projectsTl.call(() => activateProject(0), undefined, 0.1);
-  projectsTl.call(() => activateProject(1), undefined, 0.46);
-  projectsTl.call(() => activateProject(2), undefined, 0.78);
+  projectsTl.to(introNodes, { autoAlpha: 1, y: 0, duration: 0.1, stagger: 0.03 }, 0.02);
+  projectsTl.to(stage, { "--project-field-shift": "20px", duration: 1 }, 0);
+  projectsTl.to(sharedLines, { autoAlpha: 0.78, strokeDashoffset: 0, duration: 0.15, stagger: 0.008 }, 0.03);
+  projectsTl.to(sharedParts, { autoAlpha: 1, scale: 1, duration: 0.14 }, 0.04);
+
+  projectsTl.call(() => setMode(0), undefined, 0.2);
+  projectsTl.to(modeAssets.fleetfuel.parts, { x: 0, y: 0, rotation: 0, autoAlpha: 1, duration: 0.2 }, 0.16);
+  projectsTl.to(
+    [...modeAssets.steuerfux.parts, ...modeAssets.automation.parts],
+    { autoAlpha: 0.32, duration: 0.16 },
+    0.18
+  );
+  projectsTl.to(modeAssets.fleetfuel.overlays, { autoAlpha: 1, duration: 0.18 }, 0.19);
+  projectsTl.to(modeAssets.fleetfuel.callouts, { autoAlpha: 1, duration: 0.16 }, 0.2);
+  projectsTl.to(
+    modeAssets.fleetfuel.traces,
+    { strokeDashoffset: 0, duration: 0.19, stagger: 0.014 },
+    0.2
+  );
+  projectsTl.to(orderedPanels[0], { autoAlpha: 1, y: 0, scale: 1, duration: 0.17 }, 0.2);
+  projectsTl.to([orderedPanels[1], orderedPanels[2]], { autoAlpha: 0.2, y: 14, scale: 0.97, duration: 0.16 }, 0.2);
+  projectsTl.to(dots[0], { autoAlpha: 1, scale: 1.08, duration: 0.14 }, 0.22);
+  projectsTl.to([dots[1], dots[2]], { autoAlpha: 0.42, scale: 1, duration: 0.14 }, 0.22);
+
+  projectsTl.to(
+    modeAssets.fleetfuel.parts,
+    {
+      x: -16 * offsetScale,
+      y: -12 * offsetScale,
+      rotation: -2 * offsetScale,
+      autoAlpha: 0.56,
+      duration: 0.1
+    },
+    0.36
+  );
+  projectsTl.to(modeAssets.fleetfuel.overlays, { autoAlpha: 0.18, duration: 0.1 }, 0.36);
+  projectsTl.to(modeAssets.fleetfuel.callouts, { autoAlpha: 0.14, duration: 0.1 }, 0.36);
+  projectsTl.to(orderedPanels[0], { autoAlpha: 0.24, y: -4, scale: 0.97, duration: 0.1 }, 0.36);
+
+  projectsTl.call(() => setMode(1), undefined, 0.52);
+  projectsTl.to(modeAssets.steuerfux.parts, { x: 0, y: 0, rotation: 0, autoAlpha: 1, duration: 0.2 }, 0.46);
+  projectsTl.to(
+    modeAssets.fleetfuel.parts,
+    {
+      x: -20 * offsetScale,
+      y: -14 * offsetScale,
+      rotation: -2.8 * offsetScale,
+      autoAlpha: 0.34,
+      duration: 0.2
+    },
+    0.46
+  );
+  projectsTl.to(
+    modeAssets.automation.parts,
+    {
+      x: modeOffsets.automation.x,
+      y: modeOffsets.automation.y,
+      rotation: modeOffsets.automation.rotation,
+      autoAlpha: 0.34,
+      duration: 0.2
+    },
+    0.46
+  );
+  projectsTl.to(modeAssets.steuerfux.overlays, { autoAlpha: 1, duration: 0.18 }, 0.5);
+  projectsTl.to(modeAssets.steuerfux.callouts, { autoAlpha: 1, duration: 0.16 }, 0.52);
+  projectsTl.to(
+    modeAssets.steuerfux.traces,
+    { strokeDashoffset: 0, duration: 0.19, stagger: 0.012 },
+    0.5
+  );
+  projectsTl.to(orderedPanels[1], { autoAlpha: 1, y: 0, scale: 1, duration: 0.17 }, 0.5);
+  projectsTl.to([orderedPanels[0], orderedPanels[2]], { autoAlpha: 0.22, y: 12, scale: 0.97, duration: 0.16 }, 0.5);
+  projectsTl.to(dots[1], { autoAlpha: 1, scale: 1.08, duration: 0.14 }, 0.52);
+  projectsTl.to([dots[0], dots[2]], { autoAlpha: 0.42, scale: 1, duration: 0.14 }, 0.52);
+
+  projectsTl.to(
+    modeAssets.steuerfux.parts,
+    {
+      x: 22 * offsetScale,
+      y: -8 * offsetScale,
+      rotation: 2.6 * offsetScale,
+      autoAlpha: 0.56,
+      duration: 0.1
+    },
+    0.66
+  );
+  projectsTl.to(modeAssets.steuerfux.overlays, { autoAlpha: 0.18, duration: 0.1 }, 0.66);
+  projectsTl.to(modeAssets.steuerfux.callouts, { autoAlpha: 0.14, duration: 0.1 }, 0.66);
+  projectsTl.to(orderedPanels[1], { autoAlpha: 0.24, y: -4, scale: 0.97, duration: 0.1 }, 0.66);
+
+  projectsTl.call(() => setMode(2), undefined, 0.82);
+  projectsTl.to(modeAssets.automation.parts, { x: 0, y: 0, rotation: 0, autoAlpha: 1, duration: 0.2 }, 0.76);
+  projectsTl.to(
+    modeAssets.steuerfux.parts,
+    {
+      x: 24 * offsetScale,
+      y: -10 * offsetScale,
+      rotation: 3 * offsetScale,
+      autoAlpha: 0.34,
+      duration: 0.2
+    },
+    0.76
+  );
+  projectsTl.to(
+    modeAssets.fleetfuel.parts,
+    {
+      x: -24 * offsetScale,
+      y: -16 * offsetScale,
+      rotation: -3 * offsetScale,
+      autoAlpha: 0.3,
+      duration: 0.2
+    },
+    0.76
+  );
+  projectsTl.to(modeAssets.automation.overlays, { autoAlpha: 1, duration: 0.18 }, 0.8);
+  projectsTl.to(modeAssets.automation.callouts, { autoAlpha: 1, duration: 0.17 }, 0.82);
+  projectsTl.to(
+    modeAssets.automation.traces,
+    { strokeDashoffset: 0, duration: 0.2, stagger: 0.01 },
+    0.8
+  );
+  projectsTl.to(orderedPanels[2], { autoAlpha: 1, y: 0, scale: 1, duration: 0.17 }, 0.8);
+  projectsTl.to([orderedPanels[0], orderedPanels[1]], { autoAlpha: 0.22, y: 12, scale: 0.97, duration: 0.16 }, 0.8);
+  projectsTl.to(dots[2], { autoAlpha: 1, scale: 1.08, duration: 0.14 }, 0.82);
+  projectsTl.to([dots[0], dots[1]], { autoAlpha: 0.42, scale: 1, duration: 0.14 }, 0.82);
+
+  projectsTl.call(() => {
+    act.dataset.projectMode = "resolve";
+  }, undefined, 0.92);
+  projectsTl.to(
+    modeAssets.fleetfuel.parts,
+    { ...modeBalancedOffsets.fleetfuel, autoAlpha: 0.62, duration: 0.08 },
+    0.92
+  );
+  projectsTl.to(
+    modeAssets.steuerfux.parts,
+    { ...modeBalancedOffsets.steuerfux, autoAlpha: 0.64, duration: 0.08 },
+    0.92
+  );
+  projectsTl.to(
+    modeAssets.automation.parts,
+    { ...modeBalancedOffsets.automation, autoAlpha: 0.66, duration: 0.08 },
+    0.92
+  );
+  projectsTl.to(allOverlays, { autoAlpha: 0.24, duration: 0.08 }, 0.92);
+  projectsTl.to(allCallouts, { autoAlpha: 0.22, duration: 0.08 }, 0.92);
+  projectsTl.to(orderedPanels, { autoAlpha: 0.42, y: 7, scale: 0.98, duration: 0.08, stagger: 0.01 }, 0.92);
+  projectsTl.to(orderedPanels[2], { autoAlpha: 0.86, y: 0, scale: 1, duration: 0.08 }, 0.95);
+  projectsTl.to(dots, { autoAlpha: 0.54, scale: 1, duration: 0.08 }, 0.92);
+  projectsTl.to(dots[2], { autoAlpha: 1, scale: 1.06, duration: 0.08 }, 0.95);
 }
 
 function setupToolboxScene(root: HTMLElement, breakpoint: HomeBreakpoint): void {

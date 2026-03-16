@@ -1,6 +1,6 @@
 ---
 import type { ProjectsSection } from "../../content/homeContent";
-import TechnicalDiagram from "./TechnicalDiagram.astro";
+import ProjectsAssemblyDiagram from "./ProjectsAssemblyDiagram.astro";
 
 interface Props {
   content: ProjectsSection;
@@ -11,95 +11,49 @@ const { content } = Astro.props;
 
 <section id="act-projects" class="home-act act-projects" data-act="projects">
   <div class="act-panel act-panel-projects" data-scene-panel>
-    <header class="act-header act-header-projects">
-      <p class="act-kicker" data-reveal>{content.actTitle}</p>
-      <h2 class="act-title" data-reveal>{content.heading}</h2>
-      <p class="act-intro" data-reveal>{content.intro}</p>
-    </header>
+    <div class="projects-scene" data-project-stage data-project-scene>
+      <header class="act-header act-header-projects">
+        <p class="act-kicker" data-reveal>{content.actTitle}</p>
+        <h2 class="act-title" data-reveal>{content.heading}</h2>
+        <p class="act-intro" data-reveal>{content.intro}</p>
+      </header>
 
-    <div class="project-stage" data-project-stage data-project-scene>
-      <svg
-        class="project-system-lines"
-        viewBox="0 0 960 520"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <path data-project-link data-line-draw d="M186 190H476" />
-        <path data-project-link data-line-draw d="M476 190V136H712" />
-        <path data-project-link data-line-draw d="M476 190V344H812" />
-        <path data-project-link data-line-draw d="M186 394H812" />
-      </svg>
+      <div class="projects-assembly-field" data-project-field aria-hidden="true">
+        <ProjectsAssemblyDiagram className="projects-assembly-diagram" />
+      </div>
 
-      {content.stations.map((station, index) => (
-        <article
-          class={`project-station project-station-${station.id}`}
-          data-reveal
-          data-node
-          data-project-station
-          data-project-index={index}
-          style={`--station-index:${index};`}
-        >
-          <p class="project-motif">{station.motif}</p>
-          <h3>{station.title}</h3>
-          <p>{station.body}</p>
-          <ul>
-            {station.bullets.map((bullet) => (
-              <li>{bullet}</li>
-            ))}
-          </ul>
-          <div class="project-tags" aria-label={`${station.title} stack`}>
-            {station.tags.map((tag) => (
-              <span>{tag}</span>
-            ))}
-          </div>
-
-          <svg
-            class={`project-overlay project-overlay-${station.id}`}
-            viewBox="0 0 300 170"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
+      <div class="project-spec-layer">
+        {content.stations.map((station, index) => (
+          <article
+            class={`project-spec-panel project-spec-panel-${station.id}`}
+            data-project-panel
+            data-project-mode={station.id}
+            data-node
+            style={`--project-index:${index};`}
           >
-            {station.id === "fleetfuel" && (
-              <>
-                <path data-project-trace d="M24 128C60 82 108 56 154 56C198 56 240 82 278 128" />
-                <path data-project-trace d="M38 128H262" />
-                <circle data-project-trace cx="156" cy="56" r="14" />
-              </>
-            )}
-            {station.id === "steuerfux" && (
-              <>
-                <rect data-project-trace x="42" y="30" width="164" height="112" rx="12" />
-                <path data-project-trace d="M222 46L266 46V138H112" />
-                <path data-project-trace d="M68 62H180" />
-                <path data-project-trace d="M68 88H180" />
-                <path data-project-trace d="M68 114H158" />
-              </>
-            )}
-            {station.id === "automation" && (
-              <>
-                <circle data-project-trace cx="70" cy="86" r="18" />
-                <circle data-project-trace cx="154" cy="44" r="16" />
-                <circle data-project-trace cx="242" cy="88" r="18" />
-                <circle data-project-trace cx="156" cy="132" r="14" />
-                <path data-project-trace d="M88 76L138 54" />
-                <path data-project-trace d="M170 52L224 80" />
-                <path data-project-trace d="M228 104L170 126" />
-                <path data-project-trace d="M142 124L86 96" />
-              </>
-            )}
-          </svg>
-        </article>
-      ))}
+            <p class="project-panel-kicker">Subsystem 0{index + 1}</p>
+            <h3>{station.title}</h3>
+            <p class="project-panel-body">{station.body}</p>
+            <ul>
+              {station.bullets.map((bullet) => (
+                <li>{bullet}</li>
+              ))}
+            </ul>
+            <p class="project-motif">{station.motif}</p>
+            <div class="project-tags" aria-label={`${station.title} stack`}>
+              {station.tags.map((tag) => (
+                <span>{tag}</span>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
 
-      <ol class="project-activation-track" aria-hidden="true">
+      <ol class="project-mode-track" aria-hidden="true">
         <li data-project-dot></li>
         <li data-project-dot></li>
         <li data-project-dot></li>
       </ol>
     </div>
-
-    <TechnicalDiagram variant="projects" className="projects-diagram" />
   </div>
 </section>
