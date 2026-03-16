@@ -69,6 +69,20 @@ body.narrative-home footer hr {
   isolation: isolate;
 }
 
+@media (min-width: 1080px) {
+  .home-narrative {
+    gap: 1.1rem;
+  }
+
+  .home-act[data-act="hero"] .act-panel,
+  .home-act[data-act="experience"] .act-panel,
+  .home-act[data-act="projects"] .act-panel,
+  .home-act[data-act="toolbox"] .act-panel,
+  .home-act[data-act="philosophy"] .act-panel {
+    min-height: calc(100svh - 104px);
+  }
+}
+
 .act-panel::before {
   content: "";
   position: absolute;

@@ -176,10 +176,11 @@ function setupHeroScene(root: HTMLElement, breakpoint: HomeBreakpoint): void {
     defaults: { ease: "none" },
     scrollTrigger: {
       trigger: hero,
-      start: breakpoint === "desktop" ? "top top+=72" : "top 74%",
-      end: breakpoint === "desktop" ? "+=250%" : "+=140%",
+      start: breakpoint === "desktop" ? "top top+=84" : "top 74%",
+      end: breakpoint === "desktop" ? "+=320%" : "+=155%",
       scrub: true,
       pin: breakpoint === "desktop",
+      pinSpacing: true,
       anticipatePin: 1
     }
   });
@@ -290,10 +291,11 @@ function setupExperienceScene(root: HTMLElement, breakpoint: HomeBreakpoint): vo
     defaults: { ease: "none" },
     scrollTrigger: {
       trigger: act,
-      start: breakpoint === "desktop" ? "top top+=90" : "top 74%",
-      end: breakpoint === "desktop" ? "+=170%" : "bottom 32%",
+      start: breakpoint === "desktop" ? "top top+=84" : "top 74%",
+      end: breakpoint === "desktop" ? "+=220%" : "bottom 30%",
       scrub: true,
       pin: breakpoint === "desktop",
+      pinSpacing: true,
       anticipatePin: 1
     }
   });
@@ -381,10 +383,11 @@ function setupProjectsScene(root: HTMLElement, breakpoint: HomeBreakpoint): void
     defaults: { ease: "none" },
     scrollTrigger: {
       trigger: stage,
-      start: breakpoint === "desktop" ? "top top+=92" : "top 72%",
-      end: breakpoint === "desktop" ? "+=290%" : "bottom 28%",
+      start: breakpoint === "desktop" ? "top top+=84" : "top 72%",
+      end: breakpoint === "desktop" ? "+=340%" : "bottom 26%",
       scrub: true,
       pin: breakpoint === "desktop",
+      pinSpacing: true,
       anticipatePin: 1
     }
   });
@@ -417,10 +420,11 @@ function setupToolboxScene(root: HTMLElement, breakpoint: HomeBreakpoint): void 
     defaults: { ease: "none" },
     scrollTrigger: {
       trigger: act,
-      start: breakpoint === "desktop" ? "top top+=96" : "top 74%",
-      end: breakpoint === "desktop" ? "+=160%" : "bottom 30%",
+      start: breakpoint === "desktop" ? "top top+=84" : "top 74%",
+      end: breakpoint === "desktop" ? "+=220%" : "bottom 30%",
       scrub: true,
       pin: breakpoint === "desktop",
+      pinSpacing: true,
       anticipatePin: 1
     }
   });
@@ -478,10 +482,11 @@ function setupPhilosophyScene(root: HTMLElement, breakpoint: HomeBreakpoint): vo
     defaults: { ease: "none" },
     scrollTrigger: {
       trigger: scene,
-      start: breakpoint === "desktop" ? "top top+=96" : "top 74%",
-      end: breakpoint === "desktop" ? "+=165%" : "bottom 30%",
+      start: breakpoint === "desktop" ? "top top+=84" : "top 74%",
+      end: breakpoint === "desktop" ? "+=220%" : "bottom 28%",
       scrub: true,
       pin: breakpoint === "desktop",
+      pinSpacing: true,
       anticipatePin: 1
     }
   });
