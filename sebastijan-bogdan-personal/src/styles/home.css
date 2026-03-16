@@ -237,7 +237,7 @@ body.narrative-home footer hr {
   letter-spacing: 0.045em;
   color: color-mix(in srgb, var(--home-muted) 84%, var(--home-text) 16%);
   white-space: nowrap;
-  opacity: 0;
+  opacity: 0.34;
 }
 
 .hero-label:nth-child(1) {

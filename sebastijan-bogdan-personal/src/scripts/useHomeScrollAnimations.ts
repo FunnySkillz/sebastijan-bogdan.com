@@ -26,7 +26,13 @@ function primeSvgLine(line: SVGElement): number {
 
   const length = target.getTotalLength();
   line.style.strokeDasharray = `${length}`;
-  line.style.strokeDashoffset = `${length}`;
+
+  const isHeroModuleLine =
+    line.closest("[data-hero-module]") !== null &&
+    line.getAttribute("data-hero-connector") === null &&
+    line.getAttribute("data-hero-node") === null;
+
+  line.style.strokeDashoffset = `${isHeroModuleLine ? length * 0.52 : length}`;
   return length;
 }
 
@@ -151,9 +157,9 @@ function setupHeroScene(root: HTMLElement, breakpoint: HomeBreakpoint): void {
     product: { x: -46, y: 90, rotation: -5, scale: 0.92 }
   };
 
-  gsap.set(textNodes, { autoAlpha: 0, y: 26 });
-  gsap.set(labels, { autoAlpha: 0, x: 16 });
-  gsap.set(stageDots, { autoAlpha: 0.35 });
+  gsap.set(textNodes, { autoAlpha: 1, y: 0 });
+  gsap.set(labels, { autoAlpha: 0.34, x: 0 });
+  gsap.set(stageDots, { autoAlpha: 0.52 });
   gsap.set(heroScene, { autoAlpha: 0.86, scale: 0.95, transformOrigin: "center center" });
 
   modules.forEach((module) => {
@@ -185,7 +191,6 @@ function setupHeroScene(root: HTMLElement, breakpoint: HomeBreakpoint): void {
     }
   });
 
-  heroTl.to(textNodes, { autoAlpha: 1, y: 0, duration: 0.2, stagger: 0.03 }, 0);
   heroTl.to(heroScene, { autoAlpha: 1, scale: 1, duration: 0.2 }, 0.02);
   heroTl.to(panel, { "--panel-grid-shift": "26px", duration: 1 }, 0);
 
@@ -281,11 +286,11 @@ function setupExperienceScene(root: HTMLElement, breakpoint: HomeBreakpoint): vo
 
   if (!scene || !spineLine || !nodes.length) return;
 
-  gsap.set(themes, { autoAlpha: 0, y: 14 });
-  gsap.set(nodes, { autoAlpha: 0, x: -22 });
-  gsap.set(miniSpecs, { autoAlpha: 0, x: 20 });
-  gsap.set(connectors, { scaleX: 0, transformOrigin: "left center" });
-  gsap.set(highlight, { autoAlpha: 0, y: 24 });
+  gsap.set(themes, { autoAlpha: 0.62, y: 8 });
+  gsap.set(nodes, { autoAlpha: 0.56, x: -8 });
+  gsap.set(miniSpecs, { autoAlpha: 0.54, x: 8 });
+  gsap.set(connectors, { scaleX: 0.3, transformOrigin: "left center" });
+  gsap.set(highlight, { autoAlpha: 0.6, y: 12 });
 
   const expTl = gsap.timeline({
     defaults: { ease: "none" },
@@ -347,8 +352,8 @@ function setupProjectsScene(root: HTMLElement, breakpoint: HomeBreakpoint): void
     Array.from(station.querySelectorAll<SVGElement>("[data-project-trace]"))
   );
 
-  gsap.set(stations, { autoAlpha: 0.26, scale: 0.9, y: 24 });
-  gsap.set(dots, { autoAlpha: 0.4 });
+  gsap.set(stations, { autoAlpha: 0.52, scale: 0.94, y: 10 });
+  gsap.set(dots, { autoAlpha: 0.54 });
   stationTraces.flat().forEach((line) => {
     primeSvgLine(line);
   });
@@ -360,8 +365,8 @@ function setupProjectsScene(root: HTMLElement, breakpoint: HomeBreakpoint): void
       const isActive = stationIndex === index;
       gsap.to(station, {
         autoAlpha: isActive ? 1 : 0.24,
-        scale: isActive ? 1.02 : 0.89,
-        y: isActive ? 0 : stationIndex < index ? -30 : 30,
+        scale: isActive ? 1.02 : 0.92,
+        y: isActive ? 0 : stationIndex < index ? -18 : 18,
         duration: 0.18,
         overwrite: "auto",
         ease: "power2.out"
@@ -413,7 +418,7 @@ function setupToolboxScene(root: HTMLElement, breakpoint: HomeBreakpoint): void 
 
   if (!board || !zones.length) return;
 
-  gsap.set(zones, { autoAlpha: 0, y: 18 });
+  gsap.set(zones, { autoAlpha: 0.58, y: 10 });
   gsap.set(indicator, { autoAlpha: 0, x: 0, y: 0 });
 
   const toolboxTl = gsap.timeline({
@@ -473,10 +478,10 @@ function setupPhilosophyScene(root: HTMLElement, breakpoint: HomeBreakpoint): vo
 
   if (!scene || !headingTop || !headingBottom || !copy || !axis) return;
 
-  gsap.set([headingTop, headingBottom], { autoAlpha: 0, y: 30, scale: 1.03 });
-  gsap.set(copy, { autoAlpha: 0, y: 20 });
-  gsap.set(axis, { scaleX: 0, transformOrigin: "left center" });
-  gsap.set(keywords, { autoAlpha: 0, y: 20 });
+  gsap.set([headingTop, headingBottom], { autoAlpha: 0.62, y: 12, scale: 1.01 });
+  gsap.set(copy, { autoAlpha: 0.58, y: 10 });
+  gsap.set(axis, { scaleX: 0.36, transformOrigin: "left center" });
+  gsap.set(keywords, { autoAlpha: 0.56, y: 10 });
 
   const philosophyTl = gsap.timeline({
     defaults: { ease: "none" },
@@ -563,7 +568,6 @@ export function initHomeScrollAnimations(options: HomeAnimationOptions): HomeAni
   const { cleanup: cleanupLenis } = initLenisIfNeeded(reducedMotion, breakpoint);
 
   const context = gsap.context(() => {
-    const revealNodes = Array.from(root.querySelectorAll<HTMLElement>(REVEAL_SELECTOR));
     const growLines = Array.from(root.querySelectorAll<HTMLElement>(LINE_GROW_SELECTOR));
     const drawLines = Array.from(root.querySelectorAll<SVGElement>(LINE_DRAW_SELECTOR));
 
@@ -584,8 +588,6 @@ export function initHomeScrollAnimations(options: HomeAnimationOptions): HomeAni
       applyReducedMotionState(root);
       return;
     }
-
-    gsap.set(revealNodes, { autoAlpha: 0, y: 18 });
 
     setupPanelTransitions(root, breakpoint);
     setupHeroScene(root, breakpoint);
