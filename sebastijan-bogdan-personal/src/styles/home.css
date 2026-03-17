@@ -52,92 +52,368 @@ body.narrative-home footer hr {
   padding: 0 1.2rem;
 }
 
-.persistent-stage-shell {
+.narrative-director-shell {
   display: none;
   opacity: 0;
+  pointer-events: none;
 }
 
-.persistent-stage {
+.narrative-director-stage {
   width: min(100%, var(--home-max-width));
   height: calc(100svh - 108px);
   margin: 0 auto;
   position: relative;
   display: grid;
   place-items: center;
+  isolation: isolate;
 }
 
-.persistent-stage-svg {
-  width: min(100%, 980px);
+.narrative-system-core {
+  width: min(100%, 1000px);
   height: auto;
   display: block;
 }
 
-.persistent-stage-svg path,
-.persistent-stage-svg rect,
-.persistent-stage-svg circle,
-.persistent-stage-svg ellipse,
-.persistent-stage-svg line {
-  stroke: color-mix(in srgb, var(--home-line) 84%, var(--home-accent) 16%);
-  stroke-width: 1.08;
+.system-core-svg path,
+.system-core-svg rect,
+.system-core-svg circle,
+.system-core-svg ellipse,
+.system-core-svg line {
+  stroke: color-mix(in srgb, var(--home-line) 85%, var(--home-accent) 15%);
+  stroke-width: 1.06;
   vector-effect: non-scaling-stroke;
 }
 
-.persistent-stage-grid path {
-  stroke-opacity: 0.22;
+.system-core-svg [data-core-family="signal-traces"] path {
+  stroke-opacity: 0.28;
 }
 
-.persistent-stage-shell-shared > * {
-  stroke-opacity: 0.74;
+.system-core-svg [data-core-family="halo-ring"] > * {
+  stroke-opacity: 0.78;
 }
 
-.persistent-stage [data-stage-mode-layer] > * {
-  stroke-opacity: 0.9;
+.system-core-svg [data-core-family="core-drum"] > * {
+  stroke-opacity: 0.86;
 }
 
-.persistent-stage-labels {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.system-core-svg [data-core-family="locking-plates"] > *,
+.system-core-svg [data-core-family="cartridges"] > *,
+.system-core-svg [data-core-family="rails"] > * {
+  stroke-opacity: 0.82;
+}
+
+.system-core-svg [data-core-mode-layer] > * {
+  stroke: color-mix(in srgb, var(--home-line) 72%, var(--home-accent) 28%);
+  stroke-opacity: 0.94;
+}
+
+.system-core-svg [data-core-transition-layer] > * {
+  stroke: color-mix(in srgb, var(--home-accent) 62%, var(--home-line) 38%);
+  stroke-opacity: 0.92;
+}
+
+.director-overlay {
   position: absolute;
-  display: grid;
-  gap: 0.38rem;
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.055em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--home-muted) 78%, var(--home-accent) 22%);
+  width: min(40rem, 42vw);
+  max-width: 42rem;
+  opacity: 0;
   pointer-events: none;
+  will-change: transform, opacity;
 }
 
-.persistent-stage-labels li {
+.director-overlay .act-title,
+.director-overlay .hero-title,
+.director-overlay .philosophy-title {
+  font-size: clamp(2rem, 3.2vw, 3.6rem);
+}
+
+.director-overlay-act1 {
+  left: 4.4%;
+  top: 8.4%;
+  max-width: 31rem;
+}
+
+.director-chip-list {
+  margin: 1.1rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.34rem;
+}
+
+.director-chip-list li {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  white-space: nowrap;
+  gap: 0.42rem;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--home-muted) 80%, var(--home-accent) 20%);
 }
 
-.persistent-stage-labels li::before {
+.director-chip-list li::before {
   content: "";
-  width: 0.46rem;
-  height: 0.46rem;
+  width: 0.44rem;
+  height: 0.44rem;
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--home-accent) 62%, var(--home-line) 38%);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.director-overlay-act2 {
+  left: 5.3%;
+  top: 12%;
+  max-width: 32rem;
+}
+
+.director-meta {
+  margin: 0.26rem 0 0;
+  color: color-mix(in srgb, var(--home-text) 78%, var(--home-muted) 22%);
+}
+
+.director-node-list {
+  margin-top: 0.88rem;
+  display: grid;
+  gap: 0.56rem;
+}
+
+.director-node-list article {
+  padding: 0.68rem 0.76rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--home-hairline) 78%, var(--home-accent) 22%);
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.director-node-list p {
+  margin: 0;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--home-muted);
+}
+
+.director-node-list h3 {
+  margin: 0.25rem 0 0;
+  font-size: 0.98rem;
+}
+
+.director-node-list span {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--home-muted);
+  font-size: 0.85rem;
+}
+
+.director-spec-card {
+  margin-top: 0.74rem;
+  padding: 0.84rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--home-hairline) 72%, var(--home-accent) 28%);
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.director-spec-card p {
+  margin: 0;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--home-muted);
+}
+
+.director-spec-card h3 {
+  margin: 0.32rem 0 0;
+  font-size: 1.66rem;
+  line-height: 1.05;
+}
+
+.director-spec-card span {
+  display: block;
+  margin-top: 0.24rem;
+  color: var(--home-muted);
+}
+
+.director-overlay-act3 {
+  right: 4.8%;
+  top: 11.2%;
+  max-width: 30rem;
+}
+
+.director-project-panels {
+  margin-top: 0.88rem;
+  display: grid;
+  gap: 0.56rem;
+}
+
+.director-project-panels article {
+  padding: 0.76rem 0.82rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--home-hairline) 76%, var(--home-accent) 24%);
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.director-project-panels p {
+  margin: 0;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--home-muted);
+}
+
+.director-project-panels h3 {
+  margin: 0.3rem 0 0;
+  font-size: 1.12rem;
+}
+
+.director-project-panels span {
+  display: block;
+  margin-top: 0.24rem;
+  color: color-mix(in srgb, var(--home-text) 76%, var(--home-muted) 24%);
+}
+
+.director-project-panels ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.2rem;
+  color: color-mix(in srgb, var(--home-text) 76%, var(--home-muted) 24%);
+}
+
+.director-track {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: flex;
+  gap: 0.42rem;
+}
+
+.director-track li {
+  width: 2rem;
+  height: 0.24rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--home-hairline) 78%, var(--home-line) 22%);
+  background: rgba(255, 255, 255, 0.48);
+}
+
+.director-track li.is-active {
+  border-color: color-mix(in srgb, var(--home-accent) 64%, var(--home-line) 36%);
+  background: color-mix(in srgb, var(--home-accent) 24%, white 76%);
+}
+
+.director-overlay-act4 {
+  left: 50%;
+  top: 10%;
+  width: min(48rem, 64vw);
+  max-width: 48rem;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.director-tool-grid {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.58rem;
+  text-align: left;
+}
+
+.director-tool-grid article {
+  padding: 0.7rem 0.76rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--home-hairline) 78%, var(--home-accent) 22%);
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.director-tool-grid h3 {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.director-tool-grid ul {
+  margin: 0.34rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.36rem;
+}
+
+.director-tool-grid li {
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--home-hairline) 78%, var(--home-line) 22%);
+  font-size: 0.8rem;
+}
+
+.director-overlay-act5 {
+  left: 50%;
+  top: 11%;
+  width: min(46rem, 58vw);
+  max-width: 46rem;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: auto;
+}
+
+.director-keywords {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.48rem;
+}
+
+.director-keywords span {
+  padding: 0.4rem 0.66rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--home-hairline) 72%, var(--home-accent) 28%);
+  background: rgba(255, 255, 255, 0.62);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.director-contact {
+  margin-top: 1rem;
+}
+
+.director-contact h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.director-contact p {
+  margin: 0.35rem 0 0;
+  color: var(--home-muted);
+}
+
+.director-contact-links {
+  margin-top: 0.66rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  pointer-events: auto;
+}
+
+.director-contact-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.58rem 0.72rem;
+  border-radius: 9px;
+  border: 1px solid color-mix(in srgb, var(--home-hairline) 74%, var(--home-accent) 26%);
   background: rgba(255, 255, 255, 0.78);
+  color: color-mix(in srgb, var(--home-text) 82%, var(--home-muted) 18%);
+  text-decoration: none;
 }
 
-.persistent-stage-labels-hero {
-  left: 58%;
-  top: 13%;
-}
-
-.persistent-stage-labels-experience {
-  left: 16%;
-  top: 28%;
-}
-
-.persistent-stage-labels-projects {
-  right: 11%;
-  bottom: 18%;
+.director-overlay.is-dominant {
+  z-index: 5;
 }
 
 .act-panel {
@@ -161,66 +437,23 @@ body.narrative-home footer hr {
 }
 
 @media (min-width: 1080px) {
-  .home-narrative-shared-stage .persistent-stage-shell {
+  .home-narrative-directed[data-director-active="true"] .narrative-director-shell {
     display: block;
     position: fixed;
     inset: 94px 0 0;
-    z-index: 2;
+    z-index: 3;
     pointer-events: none;
   }
 
-  .home-narrative-shared-stage .home-act[data-act="hero"] .act-panel,
-  .home-narrative-shared-stage .home-act[data-act="experience"] .act-panel,
-  .home-narrative-shared-stage .home-act[data-act="projects"] .act-panel {
+  .home-narrative-directed[data-director-active="true"] .home-act .act-panel {
     background: transparent;
     border-color: transparent;
     box-shadow: none;
   }
 
-  .home-narrative-shared-stage .home-act[data-act="hero"] .hero-diagram-col,
-  .home-narrative-shared-stage .home-act[data-act="experience"] .experience-diagram,
-  .home-narrative-shared-stage .home-act[data-act="projects"] .projects-assembly-field {
+  .home-narrative-directed[data-director-active="true"] .home-act .act-panel > * {
     opacity: 0;
-    visibility: hidden;
-  }
-
-  .home-narrative-shared-stage .home-act[data-act="hero"] .act-content-col,
-  .home-narrative-shared-stage .home-act[data-act="experience"] .act-header,
-  .home-narrative-shared-stage .home-act[data-act="projects"] .act-header-projects {
-    position: relative;
-    z-index: 6;
-  }
-
-  .home-narrative-shared-stage .home-act[data-act="projects"] .projects-scene {
-    min-height: calc(100svh - 104px);
-    grid-template-columns: minmax(0, 4fr) minmax(0, 1fr);
-  }
-
-  .home-narrative-shared-stage .home-act[data-act="projects"] .project-spec-layer {
-    position: relative;
-    inset: auto;
-    display: grid;
-    gap: 0.8rem;
-    margin-top: 1.1rem;
-    z-index: 7;
-  }
-
-  .home-narrative-shared-stage .home-act[data-act="projects"] .project-spec-panel {
-    position: relative;
-    left: auto;
-    right: auto;
-    top: auto;
-    bottom: auto;
-    width: 100%;
-  }
-
-  .home-narrative-shared-stage .home-act[data-act="projects"] .project-mode-track {
-    position: relative;
-    right: auto;
-    bottom: auto;
-    margin-top: 0.3rem;
-    justify-content: flex-start;
-    z-index: 7;
+    pointer-events: none;
   }
 
   .home-narrative {

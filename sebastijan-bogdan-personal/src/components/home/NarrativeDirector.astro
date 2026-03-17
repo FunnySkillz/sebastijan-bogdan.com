@@ -1,0 +1,136 @@
+---
+import type { HomePageContent } from "../../content/homeContent";
+import { createStageContent } from "../../content/stage-content";
+import SystemCore from "./SystemCore.astro";
+
+interface Props {
+  content: HomePageContent;
+}
+
+const { content } = Astro.props;
+const stage = createStageContent(content);
+---
+
+<div class="narrative-director-shell" data-narrative-director>
+  <div class="narrative-director-stage" data-director-stage data-stage-mode="act1">
+    <SystemCore className="narrative-system-core" />
+
+    <article class="director-overlay director-overlay-act1" data-director-overlay data-director-act="act1">
+      <p class="act-kicker">{stage.act1.kicker}</p>
+      <h1 class="hero-title">{stage.act1.title}</h1>
+      <p class="hero-role">{stage.act1.roles[0]}</p>
+      <p class="hero-role hero-role-alt">{stage.act1.roles[1]}</p>
+      {stage.act1.paragraphs.map((paragraph) => (
+        <p class="hero-copy">{paragraph}</p>
+      ))}
+
+      <ul class="director-chip-list">
+        {stage.act1.labels.map((label) => (
+          <li>{label}</li>
+        ))}
+      </ul>
+    </article>
+
+    <article class="director-overlay director-overlay-act2" data-director-overlay data-director-act="act2">
+      <p class="act-kicker">{stage.act2.kicker}</p>
+      <h2 class="act-title">{stage.act2.title}</h2>
+      <p class="director-meta">{stage.act2.period}</p>
+      <p class="director-meta">{stage.act2.company}</p>
+      <p class="director-meta">{stage.act2.role}</p>
+
+      <div class="director-node-list">
+        {stage.act2.nodes.map((node, index) => (
+          <article data-director-emphasis style={`--node-index:${index};`}>
+            <p>{node.label}</p>
+            <h3>{node.title}</h3>
+            <span>{node.meta}</span>
+          </article>
+        ))}
+      </div>
+
+      <article class="director-spec-card">
+        <p>Specification</p>
+        <h3>{stage.act2.highlight.title}</h3>
+        <span>{stage.act2.highlight.stack}</span>
+        <span>{stage.act2.highlight.focus}</span>
+      </article>
+    </article>
+
+    <article class="director-overlay director-overlay-act3" data-director-overlay data-director-act="act3">
+      <p class="act-kicker">{stage.act3.kicker}</p>
+      <h2 class="act-title">{stage.act3.title}</h2>
+      <p class="act-intro">{stage.act3.intro}</p>
+
+      <div class="director-project-panels">
+        {stage.act3.projects.map((project, index) => (
+          <article data-director-project-panel data-project-index={index}>
+            <p>{project.motif}</p>
+            <h3>{project.title}</h3>
+            <span>{project.body}</span>
+            <ul>
+              {project.bullets.map((bullet) => (
+                <li>{bullet}</li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+
+      <ol class="director-track" aria-hidden="true">
+        <li data-director-project-dot></li>
+        <li data-director-project-dot></li>
+        <li data-director-project-dot></li>
+      </ol>
+    </article>
+
+    <article class="director-overlay director-overlay-act4" data-director-overlay data-director-act="act4">
+      <p class="act-kicker">{stage.act4.kicker}</p>
+      <h2 class="act-title">{stage.act4.title}</h2>
+      <p class="act-intro">{stage.act4.intro}</p>
+
+      <div class="director-tool-grid">
+        {stage.act4.groups.map((group) => (
+          <article data-director-emphasis>
+            <h3>{group.title}</h3>
+            <ul>
+              {group.tools.map((tool) => (
+                <li>{tool}</li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </article>
+
+    <article class="director-overlay director-overlay-act5" data-director-overlay data-director-act="act5">
+      <p class="act-kicker">{stage.act5.kicker}</p>
+      <h2 class="philosophy-title">{stage.act5.titleTop}</h2>
+      <p class="philosophy-title emphasis">{stage.act5.titleBottom}</p>
+      <p class="philosophy-copy">{stage.act5.copy}</p>
+
+      <div class="director-keywords">
+        {stage.act5.keywords.map((keyword) => (
+          <span>{keyword}</span>
+        ))}
+      </div>
+
+      <div class="director-contact">
+        <h3>{stage.act5.contact.heading}</h3>
+        <p>{stage.act5.contact.intro}</p>
+        <div class="director-contact-links">
+          {stage.act5.contact.links.map((link) => (
+            <a
+              href={link.href}
+              target={link.external ? "_blank" : undefined}
+              rel={link.external ? "noreferrer noopener" : undefined}
+              data-director-link
+            >
+              <span>{link.label}</span>
+              <span aria-hidden="true">-></span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </article>
+  </div>
+</div>

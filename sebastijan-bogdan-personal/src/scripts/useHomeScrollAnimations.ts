@@ -1,6 +1,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
+import { initHomeDirector } from "./homeDirector";
 
 export type HomeBreakpoint = "mobile" | "tablet" | "desktop";
 
@@ -288,7 +289,7 @@ function setupPersistentStage(root: HTMLElement, breakpoint: HomeBreakpoint): vo
     }
   };
 
-  gsap.set(shell, { autoAlpha: 0 });
+  gsap.set(shell, { autoAlpha: 1 });
   gsap.set(stage, { autoAlpha: 0.96, scale: 0.94, yPercent: 4, transformOrigin: "center center" });
   gsap.set(sharedLines, { autoAlpha: 0.3 });
   gsap.set(heroModeLines, { autoAlpha: 0.9 });
@@ -313,7 +314,7 @@ function setupPersistentStage(root: HTMLElement, breakpoint: HomeBreakpoint): vo
     defaults: { ease: "none" },
     scrollTrigger: {
       trigger: heroAct,
-      start: "top top+=84",
+      start: "top top",
       endTrigger: projectsAct,
       end: "bottom top+=88",
       scrub: true,
@@ -340,12 +341,12 @@ function setupPersistentStage(root: HTMLElement, breakpoint: HomeBreakpoint): vo
 
   if (heroText) {
     persistentTl.to(heroText, { autoAlpha: 1, y: 0, duration: 0.08 }, 0.04);
-    persistentTl.to(heroText, { autoAlpha: 0.18, y: -20, duration: 0.14 }, 0.22);
+    persistentTl.to(heroText, { autoAlpha: 0, y: -24, duration: 0.14 }, 0.22);
   }
 
   persistentTl.call(() => setStageMode("hero"), undefined, 0.12);
-  persistentTl.to(heroLayer, { autoAlpha: 0.18, x: -30, y: -20, rotation: -8, duration: 0.16 }, 0.2);
-  persistentTl.to(heroLabelGroup, { autoAlpha: 0.08, duration: 0.1 }, 0.22);
+  persistentTl.to(heroLayer, { autoAlpha: 0.16, x: -30, y: -20, rotation: -8, duration: 0.16 }, 0.2);
+  persistentTl.to(heroLabelGroup, { autoAlpha: 0, duration: 0.1 }, 0.22);
   persistentTl.to(experienceLayer, { autoAlpha: 1, x: 0, y: 0, rotation: 0, duration: 0.18 }, 0.24);
   persistentTl.to(experienceModeLines, { autoAlpha: 1, strokeDashoffset: 0, duration: 0.18, stagger: 0.012 }, 0.26);
   persistentTl.to(experienceLabelGroup, { autoAlpha: 1, y: 0, duration: 0.13 }, 0.28);
@@ -353,12 +354,15 @@ function setupPersistentStage(root: HTMLElement, breakpoint: HomeBreakpoint): vo
   persistentTl.to(experienceNodeCluster, { autoAlpha: 1, y: 0, duration: 0.14, stagger: 0.02 }, 0.34);
   persistentTl.call(() => setStageMode("experience"), undefined, 0.4);
 
-  persistentTl.to(experienceLayer, { autoAlpha: 0.22, x: 20, y: -12, rotation: 7, duration: 0.14 }, 0.58);
-  persistentTl.to(experienceLabelGroup, { autoAlpha: 0.1, duration: 0.1 }, 0.58);
-  persistentTl.to(projectsLayer, { autoAlpha: 1, x: 0, y: 0, rotation: 0, duration: 0.18 }, 0.6);
-  persistentTl.to(projectsModeLines, { autoAlpha: 1, strokeDashoffset: 0, duration: 0.2, stagger: 0.01 }, 0.62);
-  persistentTl.to(projectsLabelGroup, { autoAlpha: 1, y: 0, duration: 0.13 }, 0.64);
-  persistentTl.to(projectRevealNodes, { autoAlpha: 1, y: 0, duration: 0.12, stagger: 0.03 }, 0.66);
+  persistentTl.to(experienceLayer, { autoAlpha: 0.16, x: 20, y: -12, rotation: 7, duration: 0.1 }, 0.56);
+  persistentTl.to(experienceLabelGroup, { autoAlpha: 0, duration: 0.1 }, 0.56);
+  persistentTl.to(experienceRevealNodes, { autoAlpha: 0, y: -14, duration: 0.1, stagger: 0.015 }, 0.56);
+  persistentTl.to(experienceNodeCluster, { autoAlpha: 0, y: -16, duration: 0.1, stagger: 0.01 }, 0.58);
+
+  persistentTl.to(projectsLayer, { autoAlpha: 1, x: 0, y: 0, rotation: 0, duration: 0.18 }, 0.62);
+  persistentTl.to(projectsModeLines, { autoAlpha: 1, strokeDashoffset: 0, duration: 0.2, stagger: 0.01 }, 0.64);
+  persistentTl.to(projectsLabelGroup, { autoAlpha: 1, y: 0, duration: 0.13 }, 0.66);
+  persistentTl.to(projectRevealNodes, { autoAlpha: 1, y: 0, duration: 0.12, stagger: 0.03 }, 0.68);
   persistentTl.call(() => setStageMode("projects"), undefined, 0.72);
 
   if (projectPanels.length >= 3) {
@@ -1013,6 +1017,7 @@ export function initHomeScrollAnimations(options: HomeAnimationOptions): HomeAni
   gsap.registerPlugin(ScrollTrigger);
 
   const { cleanup: cleanupLenis } = initLenisIfNeeded(reducedMotion, breakpoint);
+  let cleanupDirector = () => undefined;
 
   const context = gsap.context(() => {
     const revealNodes = Array.from(root.querySelectorAll<HTMLElement>(REVEAL_SELECTOR));
@@ -1031,6 +1036,21 @@ export function initHomeScrollAnimations(options: HomeAnimationOptions): HomeAni
     drawLines.forEach((line) => {
       primeSvgLine(line);
     });
+
+    const shouldUseDirector =
+      !reducedMotion &&
+      breakpoint === "desktop" &&
+      root.querySelector("[data-narrative-director]") !== null;
+    if (shouldUseDirector) {
+      cleanupDirector = initHomeDirector({
+        root,
+        breakpoint,
+        reducedMotion
+      }).destroy;
+      return;
+    }
+
+    root.removeAttribute("data-director-active");
 
     if (reducedMotion) {
       applyReducedMotionState(root);
@@ -1055,6 +1075,7 @@ export function initHomeScrollAnimations(options: HomeAnimationOptions): HomeAni
   return {
     destroy: () => {
       context.revert();
+      cleanupDirector();
       cleanupLenis();
     }
   };

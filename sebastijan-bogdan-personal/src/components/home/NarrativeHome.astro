@@ -4,7 +4,7 @@ import type { HomeLocale, HomePageContent } from "../../content/homeContent";
 import HeroAct from "./HeroAct.astro";
 import ExperienceAct from "./ExperienceAct.astro";
 import ProjectsAct from "./ProjectsAct.astro";
-import PersistentSystemStage from "./PersistentSystemStage.astro";
+import NarrativeDirector from "./NarrativeDirector.astro";
 import ToolboxAct from "./ToolboxAct.astro";
 import PhilosophyAct from "./PhilosophyAct.astro";
 import ContactAct from "./ContactAct.astro";
@@ -17,8 +17,8 @@ interface Props {
 const { locale, content } = Astro.props;
 ---
 
-<div class="home-narrative home-narrative-shared-stage" data-home-root data-locale={locale}>
-  <PersistentSystemStage content={content} />
+<div class="home-narrative home-narrative-directed" data-home-root data-locale={locale}>
+  <NarrativeDirector content={content} />
   <HeroAct content={content.hero} />
   <ExperienceAct content={content.experience} />
   <ProjectsAct content={content.projects} />
