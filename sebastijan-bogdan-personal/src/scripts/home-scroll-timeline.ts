@@ -29,6 +29,7 @@ export interface HomeScrollTimelineHandle {
 
 const ACT_IDS = ["act1", "act2", "act3", "act4", "act5"] as const;
 type DirectorActId = (typeof ACT_IDS)[number];
+type TransitionId = "trans-12" | "trans-23" | "trans-34" | "trans-45";
 
 export const DIRECTOR_RANGES: DirectorRange[] = [
   { id: "act1", start: 0.0, end: 0.16, kind: "act" },
@@ -41,6 +42,27 @@ export const DIRECTOR_RANGES: DirectorRange[] = [
   { id: "trans-45", start: 0.93, end: 1.0, kind: "transition" }
 ];
 
+const TRANSITION_PAIR_BY_ID: Record<TransitionId, { from: DirectorActId; to: DirectorActId }> = {
+  "trans-12": { from: "act1", to: "act2" },
+  "trans-23": { from: "act2", to: "act3" },
+  "trans-34": { from: "act3", to: "act4" },
+  "trans-45": { from: "act4", to: "act5" }
+};
+
+const OVERLAY_TRANSITION = {
+  outFadeStart: 0.18,
+  outFadeEnd: 0.56,
+  inFadeStart: 0.44,
+  inFadeEnd: 0.82
+} as const;
+
+const PROJECT_WINDOW = {
+  start: 0.52,
+  end: 0.84,
+  centers: [0.18, 0.52, 0.84],
+  spread: 0.34
+} as const;
+
 function clamp(value: number, min = 0, max = 1): number {
   return Math.min(max, Math.max(min, value));
 }
@@ -50,51 +72,61 @@ function rangeLerp(progress: number, start: number, end: number): number {
   return clamp((progress - start) / (end - start));
 }
 
-function computeVisibility(progress: number): Record<DirectorActId, number> {
-  const p = clamp(progress);
-  const map: Record<DirectorActId, number> = {
+function makeEmptyVisibilityMap(): Record<DirectorActId, number> {
+  return {
     act1: 0,
     act2: 0,
     act3: 0,
     act4: 0,
     act5: 0
   };
+}
 
-  if (p <= 0.16) {
-    map.act1 = 1;
-  } else if (p < 0.24) {
-    map.act1 = 1 - rangeLerp(p, 0.16, 0.24);
+function getRangeAtProgress(progress: number): DirectorRange {
+  const p = clamp(progress);
+  const lastIndex = DIRECTOR_RANGES.length - 1;
+  const found = DIRECTOR_RANGES.find(
+    (range, index) => p >= range.start && (p < range.end || index === lastIndex)
+  );
+
+  return found ?? DIRECTOR_RANGES[0];
+}
+
+function computeVisibility(progress: number): Record<DirectorActId, number> {
+  const range = getRangeAtProgress(progress);
+  const visibilityMap = makeEmptyVisibilityMap();
+
+  if (range.kind === "act") {
+    visibilityMap[range.id as DirectorActId] = 1;
+    return visibilityMap;
   }
 
-  if (p >= 0.2 && p < 0.3) {
-    map.act2 = rangeLerp(p, 0.2, 0.3);
-  } else if (p >= 0.3 && p <= 0.44) {
-    map.act2 = 1;
-  } else if (p > 0.44 && p < 0.52) {
-    map.act2 = 1 - rangeLerp(p, 0.44, 0.52);
+  const pair = TRANSITION_PAIR_BY_ID[range.id as TransitionId];
+  if (!pair) {
+    return visibilityMap;
   }
 
-  if (p >= 0.5 && p < 0.6) {
-    map.act3 = rangeLerp(p, 0.5, 0.6);
-  } else if (p >= 0.6 && p <= 0.74) {
-    map.act3 = 1;
-  } else if (p > 0.74 && p < 0.8) {
-    map.act3 = 1 - rangeLerp(p, 0.74, 0.8);
-  }
+  const transitionProgress = rangeLerp(progress, range.start, range.end);
+  const { outFadeStart, outFadeEnd, inFadeStart, inFadeEnd } = OVERLAY_TRANSITION;
 
-  if (p >= 0.78 && p < 0.86) {
-    map.act4 = rangeLerp(p, 0.78, 0.86);
-  } else if (p >= 0.86 && p <= 0.93) {
-    map.act4 = 1;
-  } else if (p > 0.93 && p < 0.97) {
-    map.act4 = 1 - rangeLerp(p, 0.93, 0.97);
-  }
+  const outgoingAlpha =
+    transitionProgress <= outFadeStart
+      ? 1
+      : transitionProgress >= outFadeEnd
+        ? 0
+        : 1 - rangeLerp(transitionProgress, outFadeStart, outFadeEnd);
 
-  if (p >= 0.95) {
-    map.act5 = rangeLerp(p, 0.95, 1);
-  }
+  const incomingAlpha =
+    transitionProgress <= inFadeStart
+      ? 0
+      : transitionProgress >= inFadeEnd
+        ? 1
+        : rangeLerp(transitionProgress, inFadeStart, inFadeEnd);
 
-  return map;
+  visibilityMap[pair.from] = clamp(outgoingAlpha);
+  visibilityMap[pair.to] = clamp(incomingAlpha);
+
+  return visibilityMap;
 }
 
 function getDominantAct(visibilityMap: Record<DirectorActId, number>): DirectorActId {
@@ -117,37 +149,47 @@ function syncProjectMode(
     return { panelIndex: 0, panelEmphasis: 0 };
   }
 
-  let activeIndex = 0;
-  let emphasis = 0.18;
+  const inProjectWindow = progress >= PROJECT_WINDOW.start && progress <= PROJECT_WINDOW.end;
+  const localProgress = inProjectWindow
+    ? rangeLerp(progress, PROJECT_WINDOW.start, PROJECT_WINDOW.end)
+    : 0;
 
-  if (progress >= 0.58 && progress < 0.64) {
-    activeIndex = 0;
-    emphasis = 1;
-  } else if (progress >= 0.64 && progress < 0.69) {
-    activeIndex = 1;
-    emphasis = 1;
-  } else if (progress >= 0.69 && progress <= 0.84) {
-    activeIndex = 2;
-    emphasis = 1;
-  }
+  const weights = PROJECT_WINDOW.centers.map((center) =>
+    inProjectWindow ? clamp(1 - Math.abs(localProgress - center) / PROJECT_WINDOW.spread) : 0
+  );
+
+  let activeIndex = 0;
+  let emphasis = 0;
+  weights.forEach((weight, index) => {
+    if (weight > emphasis) {
+      emphasis = weight;
+      activeIndex = index;
+    }
+  });
 
   panels.forEach((panel, index) => {
-    const isActive = index === activeIndex && emphasis > 0.6;
+    const weight = weights[index] ?? 0;
+    const isActive = index === activeIndex && emphasis >= 0.76;
+    const baseAlpha = inProjectWindow ? 0.14 : 0.06;
     panel.classList.toggle("is-active", isActive);
     gsap.set(panel, {
-      autoAlpha: isActive ? 1 : 0.24,
-      y: isActive ? 0 : 10,
-      scale: isActive ? 1 : 0.97
+      autoAlpha: baseAlpha + weight * 0.86,
+      y: 12 - weight * 12,
+      scale: 0.965 + weight * 0.035
     });
   });
 
   dots.forEach((dot, index) => {
-    const isActive = index === activeIndex && emphasis > 0.6;
+    const weight = weights[index] ?? 0;
+    const isActive = index === activeIndex && emphasis >= 0.76;
     dot.classList.toggle("is-active", isActive);
-    gsap.set(dot, { autoAlpha: isActive ? 1 : 0.42, scale: isActive ? 1.08 : 1 });
+    gsap.set(dot, {
+      autoAlpha: 0.28 + weight * 0.72,
+      scale: 1 + weight * 0.08
+    });
   });
 
-  stage.dataset.projectMode = emphasis > 0.6 ? String(activeIndex + 1) : "idle";
+  stage.dataset.projectMode = emphasis >= 0.28 ? String(activeIndex + 1) : "idle";
   return { panelIndex: activeIndex, panelEmphasis: emphasis };
 }
 
@@ -230,6 +272,11 @@ export function initHomeScrollTimeline(options: HomeScrollTimelineOptions): Home
         onLeaveBack: () => gsap.set(shell, { autoAlpha: 0 }),
         onUpdate: (self) => {
           const progress = clamp(self.progress);
+          const activeRange = getRangeAtProgress(progress);
+          const transitionPair =
+            activeRange.kind === "transition"
+              ? TRANSITION_PAIR_BY_ID[activeRange.id as TransitionId]
+              : null;
           const visibilityMap = computeVisibility(progress);
           const activeAct = getDominantAct(visibilityMap);
           const transitionActive = isTransitionProgress(progress);
@@ -239,11 +286,23 @@ export function initHomeScrollTimeline(options: HomeScrollTimelineOptions): Home
             const alpha = visibilityMap[actId];
             const overlay = overlays[actId];
             if (!overlay) return;
+
+            let yOffset = (1 - alpha) * 14;
+            if (transitionPair) {
+              if (actId === transitionPair.from) {
+                yOffset = -(1 - alpha) * 10;
+              } else if (actId === transitionPair.to) {
+                yOffset = (1 - alpha) * 20;
+              }
+            }
+
             gsap.set(overlay, {
               autoAlpha: alpha,
-              y: (1 - alpha) * 14
+              y: yOffset
             });
             overlay.classList.toggle("is-dominant", alpha >= 0.85);
+            overlay.style.zIndex = alpha > 0.01 ? String(10 + Math.round(alpha * 40)) : "0";
+            overlay.style.pointerEvents = alpha >= 0.86 ? "auto" : "none";
           });
 
           stage.dataset.stageMode = transitionActive

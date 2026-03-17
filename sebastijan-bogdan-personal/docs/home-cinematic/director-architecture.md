@@ -9,12 +9,12 @@ Desktop homepage behavior is controlled by one "movie director" pipeline:
 
 ## Layers
 1. Persistent Stage Layer
-- Component: `src/components/home/NarrativeDirector.astro`
+- Component: `src/components/home/NarrativeStage.astro`
 - Object renderer: `src/components/home/SystemCore.astro`
 - Role: keeps one center anchor alive for the whole narrative.
 
 2. Overlay Actor Layer
-- Five overlays in `NarrativeDirector.astro`, one per act (`data-director-act="act1"...`).
+- Five overlays in `NarrativeStage.astro`, one per act (`data-director-act="act1"...`).
 - Role: display act content near the stage, never as separate stacked section visuals on desktop.
 
 3. Director Motion Layer

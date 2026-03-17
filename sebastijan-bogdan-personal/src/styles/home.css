@@ -453,6 +453,7 @@ body.narrative-home footer hr {
 
   .home-narrative-directed[data-director-active="true"] .home-act .act-panel > * {
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
   }
 

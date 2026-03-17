@@ -11,8 +11,13 @@ const { content } = Astro.props;
 const stage = createStageContent(content);
 ---
 
-<div class="narrative-director-shell" data-narrative-director>
-  <div class="narrative-director-stage" data-director-stage data-stage-mode="act1">
+<div class="narrative-director-shell narrative-stage-shell" data-narrative-director data-narrative-stage>
+  <div
+    class="narrative-director-stage narrative-stage"
+    data-director-stage
+    data-narrative-stage-root
+    data-stage-mode="act1"
+  >
     <SystemCore className="narrative-system-core" />
 
     <article class="director-overlay director-overlay-act1" data-director-overlay data-director-act="act1">
@@ -134,3 +139,4 @@ const stage = createStageContent(content);
     </article>
   </div>
 </div>
+
