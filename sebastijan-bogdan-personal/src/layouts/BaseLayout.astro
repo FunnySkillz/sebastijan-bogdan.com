@@ -1,4 +1,4 @@
----
+﻿---
 import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import sbFavicon from "../assets/SB_Initials_Favicon.svg";
@@ -11,6 +11,21 @@ interface Props {
 const { title, description } = Astro.props;
 const pathname = Astro.url.pathname;
 const isEnglish = pathname === "/en" || pathname.startsWith("/en/");
+const localePrefix = isEnglish ? "/en" : "";
+const legalPaths = {
+  privacy: isEnglish ? `${localePrefix}/privacy` : "/datenschutz",
+  imprint: isEnglish ? `${localePrefix}/imprint` : "/impressum"
+};
+const footerLabels = {
+  rights: isEnglish ? "All rights reserved." : "Alle Rechte vorbehalten.",
+  privacy: isEnglish ? "Privacy" : "Datenschutz",
+  imprint: isEnglish ? "Imprint" : "Impressum"
+};
+const plausibleDomain =
+  import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN ?? import.meta.env.PLAUSIBLE_DOMAIN;
+const googleSiteVerification =
+  import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION ??
+  import.meta.env.GOOGLE_SITE_VERIFICATION;
 ---
 
 <!doctype html>
@@ -19,7 +34,20 @@ const isEnglish = pathname === "/en" || pathname.startsWith("/en/");
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    {googleSiteVerification && (
+      <meta
+        name="google-site-verification"
+        content={googleSiteVerification}
+      />
+    )}
     <link rel="icon" type="image/svg+xml" href={sbFavicon.src} />
+    {plausibleDomain && (
+      <script
+        defer
+        data-domain={plausibleDomain}
+        src="https://plausible.io/js/script.js"
+      ></script>
+    )}
     <title>{title}</title>
   </head>
   <body>
@@ -31,7 +59,12 @@ const isEnglish = pathname === "/en" || pathname.startsWith("/en/");
 
     <footer>
       <hr />
-      <p>© 2026 Sebastijan Bogdan. All rights reserved.</p>
+      <p>&copy; 2026 Sebastijan Bogdan. {footerLabels.rights}</p>
+      <p class="footer-links">
+        <a class="nav-link" href={legalPaths.privacy}>{footerLabels.privacy}</a>
+        <span aria-hidden="true">|</span>
+        <a class="nav-link" href={legalPaths.imprint}>{footerLabels.imprint}</a>
+      </p>
     </footer>
   </body>
 </html>
