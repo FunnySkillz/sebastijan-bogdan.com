@@ -1,0 +1,82 @@
+﻿---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const legalEmail =
+  import.meta.env.PUBLIC_CONTACT_EMAIL ??
+  import.meta.env.CONTACT_TO_EMAIL ??
+  "kontakt@sebastijanbogdan.com";
+---
+
+<BaseLayout
+  title="Datenschutz | Sebastijan Bogdan"
+  description="Informationen zur Verarbeitung personenbezogener Daten."
+>
+  <section>
+    <h1>Datenschutz</h1>
+
+    <p>
+      Diese Seite informiert ueber die Verarbeitung personenbezogener Daten auf
+      sebastijanbogdan.com, insbesondere beim Kontaktformular.
+    </p>
+
+    <h2>1. Verantwortlicher</h2>
+    <p>
+      Sebastijan Bogdan<br />
+      [Strasse und Hausnummer ergaenzen]<br />
+      [PLZ und Ort ergaenzen]<br />
+      E-Mail: <a href={`mailto:${legalEmail}`}>{legalEmail}</a>
+    </p>
+
+    <h2>2. Welche Daten werden verarbeitet?</h2>
+    <p>
+      Bei Nutzung des Kontaktformulars verarbeite ich die von dir angegebenen
+      Daten: Name (optional), E-Mail (optional), Telefon (optional), Nachricht
+      (pflicht) sowie technische Sicherheitsdaten (IP-Adresse, Zeitstempel,
+      Rate-Limit-Metadaten und Spam-Schutz-Token).
+    </p>
+
+    <h2>3. Zweck und Rechtsgrundlage</h2>
+    <p>
+      Die Daten werden zur Bearbeitung deiner Anfrage und zum Schutz vor Missbrauch
+      des Formulars verarbeitet. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO
+      (vorvertragliche Kommunikation) bzw. Art. 6 Abs. 1 lit. f DSGVO (berechtigtes
+      Interesse an sicherem Betrieb).
+    </p>
+
+    <h2>4. Speicherdauer</h2>
+    <p>
+      Formularanfragen werden nicht in einer eigenen Datenbank gespeichert.
+      Nachrichten werden ausschliesslich per E-Mail zugestellt und spaetestens
+      nach 180 Tagen geloescht, sofern keine gesetzliche Aufbewahrungspflicht
+      entgegensteht.
+    </p>
+
+    <h2>5. Empfaenger und Dienstleister</h2>
+    <p>
+      Zur Bereitstellung des Kontaktformulars nutze ich Dienstleister fuer
+      Hosting, E-Mail-Versand, Spam-Schutz und Rate-Limiting. Dazu gehoeren
+      insbesondere Vercel, Resend, Cloudflare Turnstile und Upstash.
+      Eine Verarbeitung kann dabei auch ausserhalb der EU stattfinden.
+    </p>
+
+    <h2>6. Deine Rechte</h2>
+    <p>
+      Du hast das Recht auf Auskunft, Berichtigung, Loeschung, Einschraenkung,
+      Datenuebertragbarkeit sowie Widerspruch gegen bestimmte Verarbeitungen.
+      Zudem besteht ein Beschwerderecht bei einer Datenschutzaufsichtsbehoerde.
+    </p>
+
+    <h2>7. Kontakt fuer Datenschutzanfragen</h2>
+    <p>
+      Bei Fragen zur Datenverarbeitung schreibe an
+      <a href={`mailto:${legalEmail}`}>{legalEmail}</a>.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+</style>
