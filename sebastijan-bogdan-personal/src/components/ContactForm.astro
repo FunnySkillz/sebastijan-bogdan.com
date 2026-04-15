@@ -1,0 +1,487 @@
+﻿---
+interface ContactFormProps {
+  locale: "de" | "en";
+  policyPath: string;
+  turnstileSiteKey?: string;
+}
+
+const { locale, policyPath, turnstileSiteKey = "" } = Astro.props;
+const isEnglish = locale === "en";
+const idPrefix = isEnglish ? "contact-en" : "contact-de";
+const hasTurnstile = Boolean(turnstileSiteKey);
+
+const copy = isEnglish
+  ? {
+      name: "Name",
+      email: "Email",
+      phone: "Phone",
+      message: "Message",
+      consentLabel: "I agree to the processing of my data according to the",
+      consentPolicy: "privacy policy",
+      consentLabelTail: ".",
+      submitIdle: "Send message",
+      submitSending: "Sending...",
+      captchaLabel: "Spam protection",
+      helper: "You can share either email or phone. Message is required.",
+      fieldErrors: {
+        emailOrPhone: "Please provide either an email or a phone number.",
+        email: "Please provide a valid email address.",
+        phone: "Please provide a valid phone number.",
+        messageLength: "Message must be between 20 and 2000 characters.",
+        consent: "Please accept data processing.",
+        captcha: "Please complete spam protection.",
+        generic: "Please review the highlighted fields."
+      },
+      status: {
+        success: "Thank you. Your message has been sent.",
+        forbidden: "Submission blocked. Please retry and complete spam protection.",
+        rateLimited: "Too many attempts. Please try again a little later.",
+        server: "Something went wrong. Please try again shortly.",
+        network: "Network issue. Please retry."
+      },
+      captchaMissing:
+        "Contact form is temporarily unavailable due to missing spam protection configuration."
+    }
+  : {
+      name: "Name",
+      email: "E-Mail",
+      phone: "Telefon",
+      message: "Nachricht",
+      consentLabel: "Ich stimme der Verarbeitung meiner Daten gemaess der",
+      consentPolicy: "Datenschutzerklaerung",
+      consentLabelTail: "zu.",
+      submitIdle: "Nachricht senden",
+      submitSending: "Wird gesendet...",
+      captchaLabel: "Spam-Schutz",
+      helper: "Du kannst E-Mail oder Telefon angeben. Die Nachricht ist erforderlich.",
+      fieldErrors: {
+        emailOrPhone: "Bitte gib entweder eine E-Mail-Adresse oder Telefonnummer an.",
+        email: "Bitte gib eine gueltige E-Mail-Adresse an.",
+        phone: "Bitte gib eine gueltige Telefonnummer an.",
+        messageLength: "Die Nachricht muss zwischen 20 und 2000 Zeichen lang sein.",
+        consent: "Bitte stimme der Datenverarbeitung zu.",
+        captcha: "Bitte bestaetige den Spam-Schutz.",
+        generic: "Bitte pruefe die markierten Felder."
+      },
+      status: {
+        success: "Danke. Deine Nachricht wurde gesendet.",
+        forbidden: "Absenden blockiert. Bitte pruefe den Spam-Schutz und versuche es erneut.",
+        rateLimited: "Zu viele Versuche. Bitte versuche es spaeter erneut.",
+        server: "Etwas ist schiefgelaufen. Bitte versuche es in kurzem Abstand erneut.",
+        network: "Netzwerkproblem. Bitte versuche es erneut."
+      },
+      captchaMissing:
+        "Das Kontaktformular ist wegen fehlender Spam-Schutz-Konfiguration aktuell nicht verfuegbar."
+    };
+---
+
+<form
+  class="contact-form"
+  action="/api/contact"
+  method="post"
+  novalidate
+  data-contact-form
+  data-requires-captcha={hasTurnstile ? "true" : "false"}
+>
+  <input type="hidden" name="locale" value={locale} />
+
+  <p class="contact-helper">{copy.helper}</p>
+
+  <div class="form-grid">
+    <div class="form-field">
+      <label for={`${idPrefix}-name`}>{copy.name}</label>
+      <input id={`${idPrefix}-name`} name="name" type="text" autocomplete="name" maxlength="120" />
+      <p class="field-error" data-error-for="name"></p>
+    </div>
+
+    <div class="form-field">
+      <label for={`${idPrefix}-email`}>{copy.email}</label>
+      <input id={`${idPrefix}-email`} name="email" type="email" autocomplete="email" maxlength="254" />
+      <p class="field-error" data-error-for="email"></p>
+    </div>
+
+    <div class="form-field">
+      <label for={`${idPrefix}-phone`}>{copy.phone}</label>
+      <input id={`${idPrefix}-phone`} name="phone" type="tel" autocomplete="tel" maxlength="30" />
+      <p class="field-error" data-error-for="phone"></p>
+    </div>
+
+    <div class="form-field form-message">
+      <label for={`${idPrefix}-message`}>{copy.message} *</label>
+      <textarea
+        id={`${idPrefix}-message`}
+        name="message"
+        rows="7"
+        minlength="20"
+        maxlength="2000"
+        required
+      ></textarea>
+      <p class="field-error" data-error-for="message"></p>
+    </div>
+
+    <div class="form-field honeypot" aria-hidden="true">
+      <label for={`${idPrefix}-company`}>Company</label>
+      <input
+        id={`${idPrefix}-company`}
+        name="company"
+        type="text"
+        autocomplete="off"
+        tabindex="-1"
+      />
+    </div>
+
+    <div class="form-field consent-field">
+      <label class="consent-option" for={`${idPrefix}-consent`}>
+        <input id={`${idPrefix}-consent`} name="consent" type="checkbox" required />
+        <span>
+          {copy.consentLabel} <a href={policyPath}>{copy.consentPolicy}</a> {copy.consentLabelTail}
+        </span>
+      </label>
+      <p class="field-error" data-error-for="consent"></p>
+    </div>
+
+    <div class="form-field">
+      <p class="captcha-label">{copy.captchaLabel}</p>
+      {hasTurnstile ? (
+        <div class="cf-turnstile" data-sitekey={turnstileSiteKey}></div>
+      ) : (
+        <p class="form-status is-error" data-config-warning>{copy.captchaMissing}</p>
+      )}
+      <p class="field-error" data-error-for="captcha"></p>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" data-submit disabled={!hasTurnstile}>{copy.submitIdle}</button>
+    <p class="form-status" data-status role="status" aria-live="polite"></p>
+  </div>
+</form>
+
+{hasTurnstile && (
+  <script
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+    async
+    defer
+  ></script>
+)}
+
+<script is:inline>
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phonePattern = /^[+0-9()\-./\s]{7,30}$/;
+
+  const forms = Array.from(document.querySelectorAll("[data-contact-form]"));
+
+  for (const form of forms) {
+    const submitButton = form.querySelector("[data-submit]");
+    const statusElement = form.querySelector("[data-status]");
+    const requiresCaptcha = form.dataset.requiresCaptcha === "true";
+
+    const setStatus = (message, type = "") => {
+      if (!statusElement) return;
+      statusElement.textContent = message;
+      statusElement.classList.remove("is-success", "is-error");
+      if (type === "success") statusElement.classList.add("is-success");
+      if (type === "error") statusElement.classList.add("is-error");
+    };
+
+    const clearFieldErrors = () => {
+      for (const errorEl of form.querySelectorAll("[data-error-for]")) {
+        errorEl.textContent = "";
+      }
+    };
+
+    const setFieldError = (fieldName, message) => {
+      const errorEl = form.querySelector(`[data-error-for="${fieldName}"]`);
+      if (errorEl) {
+        errorEl.textContent = message;
+      }
+    };
+
+    const setSending = (isSending) => {
+      if (!submitButton) return;
+      submitButton.disabled = isSending || !requiresCaptcha;
+      submitButton.textContent = isSending
+        ? (form.dataset.labelSending || "Sending...")
+        : (form.dataset.labelIdle || "Send message");
+    };
+
+    const locale = form.querySelector("input[name='locale']")?.value === "en" ? "en" : "de";
+    const dictionary = locale === "en"
+      ? {
+          submitIdle: "Send message",
+          submitSending: "Sending...",
+          emailOrPhone: "Please provide either an email or a phone number.",
+          email: "Please provide a valid email address.",
+          phone: "Please provide a valid phone number.",
+          messageLength: "Message must be between 20 and 2000 characters.",
+          consent: "Please accept data processing.",
+          captcha: "Please complete spam protection.",
+          generic: "Please review the highlighted fields.",
+          success: "Thank you. Your message has been sent.",
+          forbidden: "Submission blocked. Please retry and complete spam protection.",
+          rateLimited: "Too many attempts. Please try again a little later.",
+          server: "Something went wrong. Please try again shortly.",
+          network: "Network issue. Please retry."
+        }
+      : {
+          submitIdle: "Nachricht senden",
+          submitSending: "Wird gesendet...",
+          emailOrPhone: "Bitte gib entweder eine E-Mail-Adresse oder Telefonnummer an.",
+          email: "Bitte gib eine gueltige E-Mail-Adresse an.",
+          phone: "Bitte gib eine gueltige Telefonnummer an.",
+          messageLength: "Die Nachricht muss zwischen 20 und 2000 Zeichen lang sein.",
+          consent: "Bitte stimme der Datenverarbeitung zu.",
+          captcha: "Bitte bestaetige den Spam-Schutz.",
+          generic: "Bitte pruefe die markierten Felder.",
+          success: "Danke. Deine Nachricht wurde gesendet.",
+          forbidden: "Absenden blockiert. Bitte pruefe den Spam-Schutz und versuche es erneut.",
+          rateLimited: "Zu viele Versuche. Bitte versuche es spaeter erneut.",
+          server: "Etwas ist schiefgelaufen. Bitte versuche es in kurzem Abstand erneut.",
+          network: "Netzwerkproblem. Bitte versuche es erneut."
+        };
+
+    form.dataset.labelIdle = dictionary.submitIdle;
+    form.dataset.labelSending = dictionary.submitSending;
+    setSending(false);
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      clearFieldErrors();
+      setStatus("");
+
+      const formData = new FormData(form);
+      const email = String(formData.get("email") || "").trim();
+      const phone = String(formData.get("phone") || "").trim();
+      const message = String(formData.get("message") || "").trim();
+      const consent = formData.get("consent");
+      const captchaToken = String(formData.get("cf-turnstile-response") || "").trim();
+
+      let hasErrors = false;
+
+      if (!email && !phone) {
+        const msg = dictionary.emailOrPhone;
+        setFieldError("email", msg);
+        setFieldError("phone", msg);
+        hasErrors = true;
+      }
+
+      if (email && !emailPattern.test(email)) {
+        setFieldError("email", dictionary.email);
+        hasErrors = true;
+      }
+
+      if (phone && !phonePattern.test(phone)) {
+        setFieldError("phone", dictionary.phone);
+        hasErrors = true;
+      }
+
+      if (message.length < 20 || message.length > 2000) {
+        setFieldError("message", dictionary.messageLength);
+        hasErrors = true;
+      }
+
+      if (!consent) {
+        setFieldError("consent", dictionary.consent);
+        hasErrors = true;
+      }
+
+      if (requiresCaptcha && !captchaToken) {
+        setFieldError("captcha", dictionary.captcha);
+        hasErrors = true;
+      }
+
+      if (hasErrors) {
+        setStatus(dictionary.generic, "error");
+        return;
+      }
+
+      setSending(true);
+
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          body: formData,
+          headers: {
+            Accept: "application/json"
+          }
+        });
+
+        const payload = await response.json().catch(() => ({}));
+
+        if (payload?.fieldErrors && typeof payload.fieldErrors === "object") {
+          for (const [field, messageText] of Object.entries(payload.fieldErrors)) {
+            if (typeof messageText === "string" && messageText.length > 0) {
+              setFieldError(field, messageText);
+            }
+          }
+        }
+
+        if (response.ok) {
+          form.reset();
+          if (window.turnstile?.reset) {
+            window.turnstile.reset();
+          }
+          setStatus(dictionary.success, "success");
+          return;
+        }
+
+        if (response.status === 403) {
+          setStatus(dictionary.forbidden, "error");
+        } else if (response.status === 429) {
+          setStatus(dictionary.rateLimited, "error");
+        } else if (response.status === 400) {
+          setStatus(dictionary.generic, "error");
+        } else {
+          setStatus(dictionary.server, "error");
+        }
+      } catch (_error) {
+        setStatus(dictionary.network, "error");
+      } finally {
+        setSending(false);
+      }
+    });
+  }
+</script>
+
+<style>
+  .contact-form {
+    margin-top: 1.5rem;
+  }
+
+  .contact-helper {
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .form-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .form-field {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .form-field label {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .form-field input,
+  .form-field textarea {
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    padding: 0.7rem 0.8rem;
+    font: inherit;
+    color: var(--text-body);
+    background: #ffffff;
+  }
+
+  .form-field input:focus,
+  .form-field textarea:focus {
+    outline: 2px solid color-mix(in srgb, var(--nav-accent) 45%, white 55%);
+    outline-offset: 0;
+    border-color: color-mix(in srgb, var(--nav-accent) 70%, white 30%);
+  }
+
+  .form-message textarea {
+    resize: vertical;
+    min-height: 12rem;
+  }
+
+  .honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .consent-option {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+
+  .consent-option input {
+    margin-top: 0.2rem;
+  }
+
+  .consent-option a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .captcha-label {
+    margin: 0;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .form-actions {
+    margin-top: 1rem;
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .form-actions button {
+    border: 1px solid #111111;
+    background: #111111;
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 0.72rem 1rem;
+    font: inherit;
+    font-weight: 500;
+    width: fit-content;
+    min-width: 12rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .form-actions button:hover,
+  .form-actions button:focus-visible {
+    opacity: 0.85;
+  }
+
+  .form-actions button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .field-error {
+    margin: 0;
+    min-height: 1.1rem;
+    color: #b42318;
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .form-status {
+    margin: 0;
+    min-height: 1.2rem;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+  }
+
+  .form-status.is-success {
+    color: #157347;
+  }
+
+  .form-status.is-error {
+    color: #b42318;
+  }
+
+  @media (min-width: 768px) {
+    .form-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .form-message,
+    .consent-field,
+    .form-actions,
+    .form-grid > .form-field:last-child {
+      grid-column: 1 / -1;
+    }
+  }
+</style>
