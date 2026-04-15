@@ -26,10 +26,12 @@ const isProjectsActive =
   pathname === "/en/projects" ||
   pathname.startsWith("/en/projects/");
 const isAboutActive = pathname === "/about" || pathname === "/en/about";
+const isContactActive = pathname === "/contact" || pathname === "/en/contact";
 const labels = {
   writing: isEnglish ? "Writing" : "Schreiben",
   projects: isEnglish ? "Projects" : "Projekte",
-  about: isEnglish ? "About" : "\u00dcber"
+  about: isEnglish ? "About" : "\u00dcber",
+  contact: isEnglish ? "Contact" : "Kontakt"
 };
 ---
 
@@ -56,6 +58,12 @@ const labels = {
         class:list={["nav-link", { active: isAboutActive }]}
       >
         {labels.about}
+      </a>
+      <a
+        href={`${localePrefix}/contact`}
+        class:list={["nav-link", { active: isContactActive }]}
+      >
+        {labels.contact}
       </a>
     </div>
     <div class="lang-switch" aria-label="Language switch">
