@@ -1,46 +1,55 @@
-# Astro Starter Kit: Basics
+﻿# sebastijanbogdan.com (Astro)
 
-```sh
-npm create astro@latest -- --template basics
+Personal blog and portfolio with DE/EN routing, content collections, and a secured contact workflow.
+
+## Run locally
+
+```bash
+npm install
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Build
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+```bash
+npm run build
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Contact feature
 
-## 🧞 Commands
+- Public routes: `/contact`, `/en/contact`
+- API route: `POST /api/contact`
+- Fields: `name` (optional), `email` (optional), `phone` (optional), `message` (required), `consent` (required)
+- Validation: email-or-phone required, message length 20-2000, server-side schema checks
+- Spam controls: honeypot, Turnstile verification, Upstash rate limits (5/15min + 20/day per IP)
+- Delivery: Resend email to mailbox (`CONTACT_TO_EMAIL`)
 
-All commands are run from the root of the project, from a terminal:
+## Environment variables
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+Copy `.env.example` to `.env` and fill values:
 
-## 👀 Want to learn more?
+- `RESEND_API_KEY`
+- `CONTACT_TO_EMAIL`
+- `CONTACT_FROM_EMAIL`
+- `TURNSTILE_SITE_KEY`
+- `TURNSTILE_SECRET_KEY`
+- `UPSTASH_REDIS_REST_URL`
+- `UPSTASH_REDIS_REST_TOKEN`
+- `PLAUSIBLE_DOMAIN` (or `PUBLIC_PLAUSIBLE_DOMAIN`)
+- `GOOGLE_SITE_VERIFICATION` (or `PUBLIC_GOOGLE_SITE_VERIFICATION`)
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## Deploy (Vercel)
+
+1. Connect repo to Vercel.
+2. Add all environment variables in Vercel Project Settings.
+3. Configure domain and DNS.
+4. Deploy.
+
+## External services to configure
+
+- **Resend**: verify sending domain and from address.
+- **Cloudflare Turnstile**: create widget and add site/secret keys.
+- **Upstash Redis**: create REST database and add URL/token.
+- **Plausible**: add domain and keep `PLAUSIBLE_DOMAIN` synced.
+- **Google Search Console**: add site, verify ownership, submit sitemap:
+  - `https://sebastijanbogdan.com/sitemap-index.xml`
