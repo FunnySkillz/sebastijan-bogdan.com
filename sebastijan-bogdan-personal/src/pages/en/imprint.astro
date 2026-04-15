@@ -1,0 +1,55 @@
+﻿---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const legalEmail =
+  import.meta.env.PUBLIC_CONTACT_EMAIL ??
+  import.meta.env.CONTACT_TO_EMAIL ??
+  "kontakt@sebastijanbogdan.com";
+---
+
+<BaseLayout
+  title="Imprint | Sebastijan Bogdan"
+  description="Legal notice and contact details."
+>
+  <section>
+    <h1>Imprint</h1>
+
+    <p>
+      This imprint is prepared for a personal portfolio and blog website.
+      Please verify all legal details before production use.
+    </p>
+
+    <h2>Information pursuant to Section 5 TMG</h2>
+    <p>
+      Sebastijan Bogdan<br />
+      [Add street and number]<br />
+      [Add postal code and city]<br />
+      Germany
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      Email: <a href={`mailto:${legalEmail}`}>{legalEmail}</a>
+    </p>
+
+    <h2>Responsible for content pursuant to Section 18 (2) MStV</h2>
+    <p>
+      Sebastijan Bogdan<br />
+      [Add street and number]<br />
+      [Add postal code and city]
+    </p>
+
+    <h2>Notice</h2>
+    <p>
+      Please contact me first in case of concerns regarding any content.
+      If a justified issue is reported, it will be reviewed and addressed promptly.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+</style>
