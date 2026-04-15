@@ -1,0 +1,79 @@
+﻿---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const legalEmail =
+  import.meta.env.PUBLIC_CONTACT_EMAIL ??
+  import.meta.env.CONTACT_TO_EMAIL ??
+  "kontakt@sebastijanbogdan.com";
+---
+
+<BaseLayout
+  title="Privacy | Sebastijan Bogdan"
+  description="Information about personal data processing."
+>
+  <section>
+    <h1>Privacy</h1>
+
+    <p>
+      This page explains how personal data is processed on sebastijanbogdan.com,
+      especially when using the contact form.
+    </p>
+
+    <h2>1. Data controller</h2>
+    <p>
+      Sebastijan Bogdan<br />
+      [Add street and number]<br />
+      [Add postal code and city]<br />
+      Email: <a href={`mailto:${legalEmail}`}>{legalEmail}</a>
+    </p>
+
+    <h2>2. What data is processed?</h2>
+    <p>
+      When using the contact form, the following data may be processed: name
+      (optional), email (optional), phone (optional), message (required), and
+      technical security data (IP address, timestamp, rate-limit metadata,
+      and anti-spam token).
+    </p>
+
+    <h2>3. Purpose and legal basis</h2>
+    <p>
+      Data is processed to handle your inquiry and to protect the form against
+      abuse. Legal basis is Art. 6(1)(b) GDPR (pre-contractual communication)
+      and Art. 6(1)(f) GDPR (legitimate interest in secure operation).
+    </p>
+
+    <h2>4. Retention period</h2>
+    <p>
+      Contact form requests are not stored in a separate application database.
+      Messages are delivered only by email and deleted after 180 days at the
+      latest, unless legal retention obligations apply.
+    </p>
+
+    <h2>5. Recipients and processors</h2>
+    <p>
+      Service providers are used for hosting, email delivery, anti-spam checks,
+      and rate limiting. This includes Vercel, Resend, Cloudflare Turnstile,
+      and Upstash. Processing may also take place outside the EU.
+    </p>
+
+    <h2>6. Your rights</h2>
+    <p>
+      You have rights to access, rectification, deletion, restriction,
+      portability, and objection in certain cases. You also have the right
+      to file a complaint with a supervisory authority.
+    </p>
+
+    <h2>7. Privacy contact</h2>
+    <p>
+      For privacy questions, contact
+      <a href={`mailto:${legalEmail}`}>{legalEmail}</a>.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+</style>
