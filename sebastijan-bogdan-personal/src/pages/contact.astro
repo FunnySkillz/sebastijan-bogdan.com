@@ -1,0 +1,28 @@
+﻿---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ContactForm from "../components/ContactForm.astro";
+
+export const prerender = false;
+
+const turnstileSiteKey =
+  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? import.meta.env.TURNSTILE_SITE_KEY ?? "";
+---
+
+<BaseLayout
+  title="Kontakt | Sebastijan Bogdan"
+  description="Kontaktformular fuer Projektanfragen, Fragen und Feedback."
+>
+  <section>
+    <h1>Kontakt</h1>
+    <p class="section-intro">
+      Du hast eine Frage, Projektidee oder Feedback? Schreib mir gerne. Ich
+      melde mich in der Regel innerhalb von 1 bis 2 Werktagen.
+    </p>
+
+    <ContactForm
+      locale="de"
+      policyPath="/datenschutz"
+      turnstileSiteKey={turnstileSiteKey}
+    />
+  </section>
+</BaseLayout>
