@@ -1,0 +1,56 @@
+﻿---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const legalEmail =
+  import.meta.env.PUBLIC_CONTACT_EMAIL ??
+  import.meta.env.CONTACT_TO_EMAIL ??
+  "kontakt@sebastijanbogdan.com";
+---
+
+<BaseLayout
+  title="Impressum | Sebastijan Bogdan"
+  description="Impressum gemaess gesetzlicher Informationspflichten."
+>
+  <section>
+    <h1>Impressum</h1>
+
+    <p>
+      Dieses Impressum ist auf eine persoenliche Portfolio- und Blogseite
+      ausgerichtet. Bitte pruefe die Angaben vor Produktivgang.
+    </p>
+
+    <h2>Angaben gemaess Section 5 TMG</h2>
+    <p>
+      Sebastijan Bogdan<br />
+      [Strasse und Hausnummer ergaenzen]<br />
+      [PLZ und Ort ergaenzen]<br />
+      Deutschland
+    </p>
+
+    <h2>Kontakt</h2>
+    <p>
+      E-Mail: <a href={`mailto:${legalEmail}`}>{legalEmail}</a>
+    </p>
+
+    <h2>Verantwortlich fuer den Inhalt nach Section 18 Abs. 2 MStV</h2>
+    <p>
+      Sebastijan Bogdan<br />
+      [Strasse und Hausnummer ergaenzen]<br />
+      [PLZ und Ort ergaenzen]
+    </p>
+
+    <h2>Hinweis</h2>
+    <p>
+      Keine Abmahnung ohne vorherigen Kontakt. Sollten Inhalte oder Darstellungen
+      Rechte Dritter verletzen, bitte ich um einen kurzen Hinweis. Ich entferne
+      berechtigte Beanstandungen umgehend.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+</style>
