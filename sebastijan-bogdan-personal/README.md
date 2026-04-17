@@ -1,4 +1,4 @@
-﻿# sebastijanbogdan.com (Astro)
+﻿# sebastijan-bogdan.com (Astro)
 
 Personal blog and portfolio with DE/EN routing, content collections, and a secured contact workflow.
 
@@ -21,7 +21,7 @@ npm run build
 - API route: `POST /api/contact`
 - Fields: `name` (optional), `email` (optional), `phone` (optional), `message` (required), `consent` (required)
 - Validation: email-or-phone required, message length 20-2000, server-side schema checks
-- Spam controls: honeypot, Turnstile verification, Upstash rate limits (5/15min + 20/day per IP)
+- Spam controls: honeypot, Turnstile verification, Upstash rate limits (2/5min + 3/day per IP with 6h cooldown after the second accepted request)
 - Delivery: Resend email to mailbox (`CONTACT_TO_EMAIL`)
 
 ## Environment variables
@@ -52,4 +52,5 @@ Copy `.env.example` to `.env` and fill values:
 - **Upstash Redis**: create REST database and add URL/token.
 - **Plausible**: add domain and keep `PLAUSIBLE_DOMAIN` synced.
 - **Google Search Console**: add site, verify ownership, submit sitemap:
-  - `https://sebastijanbogdan.com/sitemap-index.xml`
+  - `https://sebastijan-bogdan.com/sitemap-index.xml`
+
