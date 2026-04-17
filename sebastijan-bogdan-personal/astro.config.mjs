@@ -3,7 +3,7 @@ import sitemap from "@astrojs/sitemap";
 import vercel from "@astrojs/vercel";
 
 export default defineConfig({
-  site: "https://sebastijanbogdan.com",
+  site: "https://sebastijan-bogdan.com",
   adapter: vercel(),
   integrations: [sitemap()],
   i18n: {
