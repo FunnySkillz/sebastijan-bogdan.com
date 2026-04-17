@@ -45,13 +45,13 @@ type RateLimitResult =
 
 const validationMessages = {
   de: {
-    invalid: "Bitte pruefe die eingegebenen Felder.",
+    invalid: "Bitte prüfe die eingegebenen Felder.",
     emailOrPhone: "Bitte gib entweder eine E-Mail-Adresse oder Telefonnummer an.",
-    email: "Bitte gib eine gueltige E-Mail-Adresse an.",
-    phone: "Bitte gib eine gueltige Telefonnummer an.",
+    email: "Bitte gib eine gültige E-Mail-Adresse an.",
+    phone: "Bitte gib eine gültige Telefonnummer an.",
     message: "Die Nachricht muss zwischen 20 und 2000 Zeichen lang sein.",
     consent: "Bitte stimme der Datenverarbeitung zu.",
-    captcha: "Bitte bestaetige den Spam-Schutz."
+    captcha: "Bitte bestätige den Spam-Schutz."
   },
   en: {
     invalid: "Please review the submitted fields.",
