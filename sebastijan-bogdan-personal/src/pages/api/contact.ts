@@ -39,6 +39,10 @@ type ResponsePayload = {
   fieldErrors?: FieldErrors;
 };
 
+type RateLimitResult =
+  | { success: true }
+  | { success: false; retryAfterSeconds?: number };
+
 const validationMessages = {
   de: {
     invalid: "Bitte pruefe die eingegebenen Felder.",
@@ -60,17 +64,32 @@ const validationMessages = {
   }
 } as const;
 
-const json = (status: number, payload: ResponsePayload): Response =>
+const json = (
+  status: number,
+  payload: ResponsePayload,
+  extraHeaders: Record<string, string> = {}
+): Response =>
   new Response(JSON.stringify(payload), {
     status,
     headers: {
       "content-type": "application/json; charset=utf-8",
-      "cache-control": "no-store"
+      "cache-control": "no-store",
+      ...extraHeaders
     }
   });
 
 const normalizeValue = (value: FormDataEntryValue | null): string =>
   typeof value === "string" ? value.trim() : "";
+
+const getRetryAfterSeconds = (reset?: number): number | undefined => {
+  if (typeof reset !== "number") {
+    return undefined;
+  }
+
+  const resetMs = reset > 1e12 ? reset : reset * 1000;
+  const deltaMs = resetMs - Date.now();
+  return Math.max(1, Math.ceil(deltaMs / 1000));
+};
 
 const getClientIp = (request: Request): string => {
   const forwarded = request.headers.get("x-forwarded-for");
@@ -220,47 +239,59 @@ const validatePayload = (
 
 const runRateLimit = async (
   ip: string,
-  userAgent: string,
   env: {
     upstashUrl: string;
     upstashToken: string;
   }
-): Promise<{ success: boolean }> => {
+): Promise<RateLimitResult> => {
   const redis = new Redis({
     url: env.upstashUrl,
     token: env.upstashToken
   });
 
-  const safeUserAgent =
-    userAgent.replaceAll(/\s+/g, " ").trim().slice(0, 120) || "anonymous";
-
   const identifier =
     ip === "unknown"
-      ? `unknown:${safeUserAgent}`
+      ? "unknown"
       : ip;
+  const cooldownKey = `contact:cooldown:6h:${identifier}`;
+
+  const cooldownTtl = await redis.ttl(cooldownKey);
+  if (typeof cooldownTtl === "number" && cooldownTtl > 0) {
+    return { success: false, retryAfterSeconds: cooldownTtl };
+  }
 
   const shortWindow = new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(5, "15 m"),
+    limiter: Ratelimit.slidingWindow(2, "5 m"),
     analytics: false,
-    prefix: "contact:15m"
+    prefix: "contact:5m"
   });
 
   const dailyWindow = new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(20, "1 d"),
+    limiter: Ratelimit.slidingWindow(3, "1 d"),
     analytics: false,
     prefix: "contact:1d"
   });
 
   const shortResult = await shortWindow.limit(identifier);
   if (!shortResult.success) {
-    return { success: false };
+    return {
+      success: false,
+      retryAfterSeconds: getRetryAfterSeconds(shortResult.reset)
+    };
   }
 
   const dailyResult = await dailyWindow.limit(identifier);
   if (!dailyResult.success) {
-    return { success: false };
+    return {
+      success: false,
+      retryAfterSeconds: getRetryAfterSeconds(dailyResult.reset)
+    };
+  }
+
+  if (typeof dailyResult.remaining === "number" && dailyResult.remaining === 1) {
+    await redis.set(cooldownKey, "1", { ex: 60 * 60 * 6 });
   }
 
   return { success: true };
@@ -352,18 +383,21 @@ export const POST: APIRoute = async ({ request, url }) => {
     }
 
     const clientIp = getClientIp(request);
-    const userAgent = request.headers.get("user-agent") ?? "";
-
-    const limitResult = await runRateLimit(clientIp, userAgent, {
+    const limitResult = await runRateLimit(clientIp, {
       upstashUrl,
       upstashToken
     });
 
     if (!limitResult.success) {
+      const retryAfterHeaders =
+        typeof limitResult.retryAfterSeconds === "number"
+          ? { "retry-after": String(limitResult.retryAfterSeconds) }
+          : {};
+
       return json(429, {
         ok: false,
         error: "rate_limited"
-      });
+      }, retryAfterHeaders);
     }
 
     let captchaValid = false;
