@@ -21,7 +21,6 @@ const copy = isEnglish
       consentLabelTail: ".",
       submitIdle: "Send message",
       submitSending: "Sending...",
-      captchaLabel: "Spam protection",
       helper: "You can share either email or phone. Message is required.",
       fieldErrors: {
         emailOrPhone: "Please provide either an email or a phone number.",
@@ -30,17 +29,18 @@ const copy = isEnglish
         messageLength: "Message must be between 20 and 2000 characters.",
         consent: "Please accept data processing.",
         captcha: "Please complete spam protection.",
-        generic: "Please review the highlighted fields."
+        generic: "Please review the highlighted fields.",
       },
       status: {
         success: "Thank you. Your message has been sent.",
-        forbidden: "Submission blocked. Please retry and complete spam protection.",
+        forbidden:
+          "Submission blocked. Please retry and complete spam protection.",
         rateLimited: "Too many attempts. Please try again a little later.",
         server: "Something went wrong. Please try again shortly.",
-        network: "Network issue. Please retry."
+        network: "Network issue. Please retry.",
       },
       captchaMissing:
-        "Contact form is temporarily unavailable due to missing spam protection configuration."
+        "Contact form is temporarily unavailable due to missing spam protection configuration.",
     }
   : {
       name: "Name",
@@ -52,26 +52,30 @@ const copy = isEnglish
       consentLabelTail: "zu.",
       submitIdle: "Nachricht senden",
       submitSending: "Wird gesendet...",
-      captchaLabel: "Spam-Schutz",
-      helper: "Du kannst E-Mail oder Telefon angeben. Die Nachricht ist erforderlich.",
+      helper:
+        "Du kannst E-Mail oder Telefon angeben. Die Nachricht ist erforderlich.",
       fieldErrors: {
-        emailOrPhone: "Bitte gib entweder eine E-Mail-Adresse oder Telefonnummer an.",
+        emailOrPhone:
+          "Bitte gib entweder eine E-Mail-Adresse oder Telefonnummer an.",
         email: "Bitte gib eine gültige E-Mail-Adresse an.",
         phone: "Bitte gib eine gültige Telefonnummer an.",
-        messageLength: "Die Nachricht muss zwischen 20 und 2000 Zeichen lang sein.",
+        messageLength:
+          "Die Nachricht muss zwischen 20 und 2000 Zeichen lang sein.",
         consent: "Bitte stimme der Datenverarbeitung zu.",
         captcha: "Bitte bestätige den Spam-Schutz.",
-        generic: "Bitte prüfe die markierten Felder."
+        generic: "Bitte prüfe die markierten Felder.",
       },
       status: {
         success: "Danke. Deine Nachricht wurde gesendet.",
-        forbidden: "Absenden blockiert. Bitte prüfe den Spam-Schutz und versuche es erneut.",
+        forbidden:
+          "Absenden blockiert. Bitte prüfe den Spam-Schutz und versuche es erneut.",
         rateLimited: "Zu viele Versuche. Bitte versuche es später erneut.",
-        server: "Etwas ist schiefgelaufen. Bitte versuche es in kurzem Abstand erneut.",
-        network: "Netzwerkproblem. Bitte versuche es erneut."
+        server:
+          "Etwas ist schiefgelaufen. Bitte versuche es in kurzem Abstand erneut.",
+        network: "Netzwerkproblem. Bitte versuche es erneut.",
       },
       captchaMissing:
-        "Das Kontaktformular ist wegen fehlender Spam-Schutz-Konfiguration aktuell nicht verfügbar."
+        "Das Kontaktformular ist wegen fehlender Spam-Schutz-Konfiguration aktuell nicht verfügbar.",
     };
 ---
 
@@ -90,19 +94,37 @@ const copy = isEnglish
   <div class="form-grid">
     <div class="form-field">
       <label for={`${idPrefix}-name`}>{copy.name}</label>
-      <input id={`${idPrefix}-name`} name="name" type="text" autocomplete="name" maxlength="120" />
+      <input
+        id={`${idPrefix}-name`}
+        name="name"
+        type="text"
+        autocomplete="name"
+        maxlength="120"
+      />
       <p class="field-error" data-error-for="name"></p>
     </div>
 
     <div class="form-field">
       <label for={`${idPrefix}-email`}>{copy.email}</label>
-      <input id={`${idPrefix}-email`} name="email" type="email" autocomplete="email" maxlength="254" />
+      <input
+        id={`${idPrefix}-email`}
+        name="email"
+        type="email"
+        autocomplete="email"
+        maxlength="254"
+      />
       <p class="field-error" data-error-for="email"></p>
     </div>
 
     <div class="form-field">
       <label for={`${idPrefix}-phone`}>{copy.phone}</label>
-      <input id={`${idPrefix}-phone`} name="phone" type="tel" autocomplete="tel" maxlength="30" />
+      <input
+        id={`${idPrefix}-phone`}
+        name="phone"
+        type="tel"
+        autocomplete="tel"
+        maxlength="30"
+      />
       <p class="field-error" data-error-for="phone"></p>
     </div>
 
@@ -114,8 +136,7 @@ const copy = isEnglish
         rows="7"
         minlength="20"
         maxlength="2000"
-        required
-      ></textarea>
+        required></textarea>
       <p class="field-error" data-error-for="message"></p>
     </div>
 
@@ -132,38 +153,52 @@ const copy = isEnglish
 
     <div class="form-field consent-field">
       <label class="consent-option" for={`${idPrefix}-consent`}>
-        <input id={`${idPrefix}-consent`} name="consent" type="checkbox" required />
+        <input
+          id={`${idPrefix}-consent`}
+          name="consent"
+          type="checkbox"
+          required
+        />
         <span>
-          {copy.consentLabel} <a href={policyPath}>{copy.consentPolicy}</a> {copy.consentLabelTail}
+          {copy.consentLabel}
+          <a href={policyPath}>{copy.consentPolicy}</a>
+          {copy.consentLabelTail}
         </span>
       </label>
       <p class="field-error" data-error-for="consent"></p>
     </div>
 
     <div class="form-field">
-      <p class="captcha-label">{copy.captchaLabel}</p>
-      {hasTurnstile ? (
-        <div class="cf-turnstile" data-sitekey={turnstileSiteKey}></div>
-      ) : (
-        <p class="form-status is-error" data-config-warning>{copy.captchaMissing}</p>
-      )}
+      {
+        hasTurnstile ? (
+          <div class="cf-turnstile" data-sitekey={turnstileSiteKey} />
+        ) : (
+          <p class="form-status is-error" data-config-warning>
+            {copy.captchaMissing}
+          </p>
+        )
+      }
       <p class="field-error" data-error-for="captcha"></p>
     </div>
   </div>
 
   <div class="form-actions">
-    <button type="submit" data-submit disabled={!hasTurnstile}>{copy.submitIdle}</button>
+    <button type="submit" data-submit disabled={!hasTurnstile}
+      >{copy.submitIdle}</button
+    >
     <p class="form-status" data-status role="status" aria-live="polite"></p>
   </div>
 </form>
 
-{hasTurnstile && (
-  <script
-    src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-    async
-    defer
-  ></script>
-)}
+{
+  hasTurnstile && (
+    <script
+      src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+      async
+      defer
+    />
+  )
+}
 
 <script is:inline>
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -201,44 +236,51 @@ const copy = isEnglish
       if (!submitButton) return;
       submitButton.disabled = isSending || !requiresCaptcha;
       submitButton.textContent = isSending
-        ? (form.dataset.labelSending || "Sending...")
-        : (form.dataset.labelIdle || "Send message");
+        ? form.dataset.labelSending || "Sending..."
+        : form.dataset.labelIdle || "Send message";
     };
 
-    const locale = form.querySelector("input[name='locale']")?.value === "en" ? "en" : "de";
-    const dictionary = locale === "en"
-      ? {
-          submitIdle: "Send message",
-          submitSending: "Sending...",
-          emailOrPhone: "Please provide either an email or a phone number.",
-          email: "Please provide a valid email address.",
-          phone: "Please provide a valid phone number.",
-          messageLength: "Message must be between 20 and 2000 characters.",
-          consent: "Please accept data processing.",
-          captcha: "Please complete spam protection.",
-          generic: "Please review the highlighted fields.",
-          success: "Thank you. Your message has been sent.",
-          forbidden: "Submission blocked. Please retry and complete spam protection.",
-          rateLimited: "Too many attempts. Please try again a little later.",
-          server: "Something went wrong. Please try again shortly.",
-          network: "Network issue. Please retry."
-        }
-      : {
-          submitIdle: "Nachricht senden",
-          submitSending: "Wird gesendet...",
-          emailOrPhone: "Bitte gib entweder eine E-Mail-Adresse oder Telefonnummer an.",
-          email: "Bitte gib eine gültige E-Mail-Adresse an.",
-          phone: "Bitte gib eine gültige Telefonnummer an.",
-          messageLength: "Die Nachricht muss zwischen 20 und 2000 Zeichen lang sein.",
-          consent: "Bitte stimme der Datenverarbeitung zu.",
-          captcha: "Bitte bestätige den Spam-Schutz.",
-          generic: "Bitte prüfe die markierten Felder.",
-          success: "Danke. Deine Nachricht wurde gesendet.",
-          forbidden: "Absenden blockiert. Bitte prüfe den Spam-Schutz und versuche es erneut.",
-          rateLimited: "Zu viele Versuche. Bitte versuche es später erneut.",
-          server: "Etwas ist schiefgelaufen. Bitte versuche es in kurzem Abstand erneut.",
-          network: "Netzwerkproblem. Bitte versuche es erneut."
-        };
+    const locale =
+      form.querySelector("input[name='locale']")?.value === "en" ? "en" : "de";
+    const dictionary =
+      locale === "en"
+        ? {
+            submitIdle: "Send message",
+            submitSending: "Sending...",
+            emailOrPhone: "Please provide either an email or a phone number.",
+            email: "Please provide a valid email address.",
+            phone: "Please provide a valid phone number.",
+            messageLength: "Message must be between 20 and 2000 characters.",
+            consent: "Please accept data processing.",
+            captcha: "Please complete spam protection.",
+            generic: "Please review the highlighted fields.",
+            success: "Thank you. Your message has been sent.",
+            forbidden:
+              "Submission blocked. Please retry and complete spam protection.",
+            rateLimited: "Too many attempts. Please try again a little later.",
+            server: "Something went wrong. Please try again shortly.",
+            network: "Network issue. Please retry.",
+          }
+        : {
+            submitIdle: "Nachricht senden",
+            submitSending: "Wird gesendet...",
+            emailOrPhone:
+              "Bitte gib entweder eine E-Mail-Adresse oder Telefonnummer an.",
+            email: "Bitte gib eine gültige E-Mail-Adresse an.",
+            phone: "Bitte gib eine gültige Telefonnummer an.",
+            messageLength:
+              "Die Nachricht muss zwischen 20 und 2000 Zeichen lang sein.",
+            consent: "Bitte stimme der Datenverarbeitung zu.",
+            captcha: "Bitte bestätige den Spam-Schutz.",
+            generic: "Bitte prüfe die markierten Felder.",
+            success: "Danke. Deine Nachricht wurde gesendet.",
+            forbidden:
+              "Absenden blockiert. Bitte prüfe den Spam-Schutz und versuche es erneut.",
+            rateLimited: "Zu viele Versuche. Bitte versuche es später erneut.",
+            server:
+              "Etwas ist schiefgelaufen. Bitte versuche es in kurzem Abstand erneut.",
+            network: "Netzwerkproblem. Bitte versuche es erneut.",
+          };
 
     form.dataset.labelIdle = dictionary.submitIdle;
     form.dataset.labelSending = dictionary.submitSending;
@@ -254,7 +296,9 @@ const copy = isEnglish
       const phone = String(formData.get("phone") || "").trim();
       const message = String(formData.get("message") || "").trim();
       const consent = formData.get("consent");
-      const captchaToken = String(formData.get("cf-turnstile-response") || "").trim();
+      const captchaToken = String(
+        formData.get("cf-turnstile-response") || "",
+      ).trim();
 
       let hasErrors = false;
 
@@ -302,14 +346,16 @@ const copy = isEnglish
           method: "POST",
           body: formData,
           headers: {
-            Accept: "application/json"
-          }
+            Accept: "application/json",
+          },
         });
 
         const payload = await response.json().catch(() => ({}));
 
         if (payload?.fieldErrors && typeof payload.fieldErrors === "object") {
-          for (const [field, messageText] of Object.entries(payload.fieldErrors)) {
+          for (const [field, messageText] of Object.entries(
+            payload.fieldErrors,
+          )) {
             if (typeof messageText === "string" && messageText.length > 0) {
               setFieldError(field, messageText);
             }
@@ -411,12 +457,6 @@ const copy = isEnglish
   .consent-option a {
     text-decoration: underline;
     text-underline-offset: 2px;
-  }
-
-  .captcha-label {
-    margin: 0;
-    font-weight: 500;
-    color: var(--text-primary);
   }
 
   .form-actions {
